@@ -4,6 +4,7 @@ data class UserModel(
     var userId: String = "",
     var username: String = "",
     var name: String = "",
+    var gender: String = "",
     var email: String = "",
     var phone: String = "",
     var totalCompleted: Int = 0,

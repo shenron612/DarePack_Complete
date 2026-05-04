@@ -24,6 +24,22 @@ class BucketListViewModel : ViewModel() {
     private val _items = MutableStateFlow<List<BucketItem>>(emptyList())
     val items: StateFlow<List<BucketItem>> = _items
 
+    private val _suggestions = MutableStateFlow<List<BucketItem>>(
+        listOf(
+            BucketItem(title = "Skydiving", category = "Adventure"),
+            BucketItem(title = "Try Sushi", category = "Food"),
+            BucketItem(title = "Learn Guitar", category = "Creative"),
+            BucketItem(title = "Run 5km", category = "Fitness"),
+            BucketItem(title = "Visit Paris", category = "Travel"),
+            BucketItem(title = "Host a Party", category = "Social"),
+            BucketItem(title = "Bungee Jumping", category = "Adventure"),
+            BucketItem(title = "Cook a 3-course meal", category = "Food"),
+            BucketItem(title = "Go Camping", category = "Travel"),
+            BucketItem(title = "Take a Pottery Class", category = "Creative")
+        )
+    )
+    val suggestions: StateFlow<List<BucketItem>> = _suggestions
+
     private val _selectedGroupId = MutableStateFlow("")
     val selectedGroupId: StateFlow<String> = _selectedGroupId
 

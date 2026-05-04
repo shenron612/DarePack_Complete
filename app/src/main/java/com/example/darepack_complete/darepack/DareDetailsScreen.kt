@@ -54,16 +54,16 @@ fun DareDetailScreen(
         .getInstance().currentUser?.uid
 
     Scaffold(
-        containerColor = DarkBg,
+        containerColor = LightBg,
         topBar = {
             TopAppBar(
-                title = { Text("Dare detail", color = Color.White, fontWeight = FontWeight.Medium) },
+                title = { Text("Dare detail", color = TextPrimary, fontWeight = FontWeight.Medium) },
                 navigationIcon = {
                     IconButton(onClick = onBack) {
-                        Icon(Icons.Default.ArrowBack, contentDescription = "Back", tint = Color.White)
+                        Icon(Icons.Default.ArrowBack, contentDescription = "Back", tint = TextPrimary)
                     }
                 },
-                colors = TopAppBarDefaults.topAppBarColors(containerColor = DarkBg)
+                colors = TopAppBarDefaults.topAppBarColors(containerColor = LightBg)
             )
         }
     ) { padding ->
@@ -76,7 +76,7 @@ fun DareDetailScreen(
 
             is DareDetailState.Error -> {
                 Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                    Text((state as DareDetailState.Error).message, color = Color.Gray)
+                    Text((state as DareDetailState.Error).message, color = TextSecondary)
                 }
             }
 
@@ -92,7 +92,7 @@ fun DareDetailScreen(
                     // Status badge
                     val statusColor = when (dare?.status) {
                         "completed" -> Teal
-                        "expired"   -> Color(0xFFE24B4A)
+                        "expired"   -> Pink
                         else        -> Purple
                     }
                     Box(
@@ -108,13 +108,14 @@ fun DareDetailScreen(
                         dare?.title ?: "",
                         fontSize   = 24.sp,
                         fontWeight = FontWeight.Bold,
-                        color      = Color.White
+                        color      = TextPrimary
                     )
 
                     // Meta info
                     Card(
-                        colors = CardDefaults.cardColors(containerColor = DarkCard),
-                        shape  = RoundedCornerShape(12.dp)
+                        colors = CardDefaults.cardColors(containerColor = LightCard),
+                        shape  = RoundedCornerShape(12.dp),
+                        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
                     ) {
                         Column(
                             Modifier.padding(16.dp),
@@ -133,7 +134,7 @@ fun DareDetailScreen(
 
                     // Proof section (if completed)
                     proof?.let { p ->
-                        Text("Proof", fontSize = 16.sp, fontWeight = FontWeight.Medium, color = Color.White)
+                        Text("Proof", fontSize = 16.sp, fontWeight = FontWeight.Medium, color = TextPrimary)
                         AsyncImage(
                             model              = p.photoUrl,
                             contentDescription = "Proof photo",
@@ -144,7 +145,7 @@ fun DareDetailScreen(
                                 .clip(RoundedCornerShape(12.dp))
                         )
                         if (p.caption.isNotBlank()) {
-                            Text(p.caption, color = Color.Gray, fontSize = 14.sp)
+                            Text(p.caption, color = TextSecondary, fontSize = 14.sp)
                         }
                         // Reactions
                         if (p.reactions.isNotEmpty()) {
@@ -153,10 +154,10 @@ fun DareDetailScreen(
                                     .forEach { (emoji, list) ->
                                         Box(
                                             Modifier
-                                                .background(DarkCard, RoundedCornerShape(20.dp))
+                                                .background(LightSurface, RoundedCornerShape(20.dp))
                                                 .padding(horizontal = 10.dp, vertical = 4.dp)
                                         ) {
-                                            Text("$emoji ${list.size}", fontSize = 13.sp, color = Color.White)
+                                            Text("$emoji ${list.size}", fontSize = 13.sp, color = TextPrimary)
                                         }
                                     }
                             }
@@ -176,12 +177,12 @@ fun DareDetailScreen(
 
                     // Complete dare section (only for the recipient, only if pending)
                     if (isMyDare && dare?.status == "pending") {
-                        HorizontalDivider(color = Color(0xFF2A2A3A))
+                        HorizontalDivider(color = LightSurface)
                         Text(
                             "Complete this dare",
                             fontSize   = 16.sp,
                             fontWeight = FontWeight.Medium,
-                            color      = Color.White
+                            color      = TextPrimary
                         )
 
                         // Photo picker
@@ -213,11 +214,11 @@ fun DareDetailScreen(
                             modifier      = Modifier.fillMaxWidth(),
                             colors        = OutlinedTextFieldDefaults.colors(
                                 focusedBorderColor   = Purple,
-                                unfocusedBorderColor = Color(0xFF2A2A3A),
+                                unfocusedBorderColor = LightSurface,
                                 focusedLabelColor    = Purple,
-                                unfocusedLabelColor  = Color.Gray,
-                                focusedTextColor     = Color.White,
-                                unfocusedTextColor   = Color.White
+                                unfocusedLabelColor  = TextSecondary,
+                                focusedTextColor     = TextPrimary,
+                                unfocusedTextColor   = TextPrimary
                             )
                         )
 
@@ -264,7 +265,7 @@ fun DareDetailScreen(
 @Composable
 fun MetaRow(label: String, value: String) {
     Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
-        Text(label, color = Color.Gray, fontSize = 13.sp)
-        Text(value, color = Color.White, fontSize = 13.sp, fontWeight = FontWeight.Medium)
+        Text(label, color = TextSecondary, fontSize = 13.sp)
+        Text(value, color = TextPrimary, fontSize = 13.sp, fontWeight = FontWeight.Medium)
     }
 }

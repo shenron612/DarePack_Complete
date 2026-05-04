@@ -8,25 +8,6 @@
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:419063798823:android:4019fa6a49ee902709c202",
-        "android_client_info": {
-          "package_name": "com.example.darepack"
-        }
-      },
-      "oauth_client": [],
-      "api_key": [
-        {
-          "current_key": "AIzaSyBpud-PkIM674xQPqedkvHm-YEI8VU3_VM"
-        }
-      ],
-      "services": {
-        "appinvite_service": {
-          "other_platform_oauth_client": []
-        }
-      }
-    },
-    {
-      "client_info": {
         "mobilesdk_app_id": "1:419063798823:android:a2a476a87b4e28af09c202",
         "android_client_info": {
           "package_name": "com.example.darepack_complete"

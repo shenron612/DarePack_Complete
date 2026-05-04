@@ -12,6 +12,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontStyle
@@ -24,6 +25,7 @@ import coil.compose.AsyncImage
 import com.example.darepack_complete.ui.theme.*
 import com.example.darepack_complete.viewmodel.MemoriesViewModel
 import com.example.darepack_complete.models.MemoryItem
+import com.example.darepack_complete.ui.components.LuminousBadge
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -37,16 +39,16 @@ fun MemoriesScreen(
     val loading  by vm.loading.collectAsState()
 
     Scaffold(
-        containerColor = DarkBg,
+        containerColor = LightBg,
         topBar = {
-            TopAppBar(
-                title = { Text("Memories", color = Color.White, fontWeight = FontWeight.Medium) },
+            CenterAlignedTopAppBar(
+                title = { Text("MEMORIES", color = PurpleDark, fontWeight = FontWeight.ExtraBold, letterSpacing = 2.sp, fontSize = 18.sp) },
                 navigationIcon = {
                     IconButton(onClick = onBack) {
-                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back", tint = Color.White)
+                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back", tint = TextPrimary)
                     }
                 },
-                colors = TopAppBarDefaults.topAppBarColors(containerColor = DarkBg)
+                colors = TopAppBarDefaults.centerAlignedTopAppBarColors(containerColor = LightBg)
             )
         }
     ) { padding ->
@@ -66,17 +68,22 @@ fun MemoriesScreen(
                     contentAlignment = Alignment.Center
                 ) {
                     Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                        Text("🏆", fontSize = 48.sp)
-                        Spacer(Modifier.height(16.dp))
+                        Box(
+                            Modifier.size(100.dp).background(Purple.copy(alpha = 0.1f), RoundedCornerShape(30.dp)),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Text("🏆", fontSize = 48.sp)
+                        }
+                        Spacer(Modifier.height(24.dp))
                         Text(
-                            "No memories yet.",
-                            color      = Color.White,
-                            fontSize   = 18.sp,
-                            fontWeight = FontWeight.Medium
+                            "Your archive is empty",
+                            color      = TextPrimary,
+                            fontSize   = 20.sp,
+                            fontWeight = FontWeight.ExtraBold
                         )
                         Text(
-                            "Complete a dare to add your first memory!",
-                            color    = Color.Gray,
+                            "Complete a dare to immortalize it!",
+                            color    = TextSecondary,
                             fontSize = 14.sp,
                             modifier = Modifier.padding(top = 8.dp)
                         )
@@ -90,14 +97,10 @@ fun MemoriesScreen(
                         .fillMaxSize()
                         .padding(padding),
                     contentPadding      = PaddingValues(16.dp),
-                    verticalArrangement = Arrangement.spacedBy(16.dp)
+                    verticalArrangement = Arrangement.spacedBy(20.dp)
                 ) {
                     item {
-                        Text(
-                            "${memories.size} memories",
-                            color    = Color.Gray,
-                            fontSize = 13.sp
-                        )
+                        LuminousBadge(text = "${memories.size} ARCHIVED DARES", color = Purple)
                     }
                     items(memories) { memory ->
                         MemoryCard(memory = memory)
@@ -113,124 +116,113 @@ fun MemoryCard(memory: MemoryItem) {
     val sdf = SimpleDateFormat("MMM dd, yyyy", Locale.getDefault())
 
     Card(
-        colors = CardDefaults.cardColors(containerColor = DarkCard),
-        shape  = RoundedCornerShape(16.dp),
-        modifier = Modifier.fillMaxWidth()
+        colors = CardDefaults.cardColors(containerColor = LightCard),
+        shape  = RoundedCornerShape(24.dp),
+        modifier = Modifier.fillMaxWidth(),
+        elevation = CardDefaults.cardElevation(defaultElevation = 0.dp),
+        border = CardDefaults.outlinedCardBorder().copy(width = 1.dp, brush = Brush.linearGradient(listOf(LightSurface, Color.Transparent)))
     ) {
         Column {
-            // Proof photo
-            if (memory.proof?.photoUrl?.isNotBlank() == true) {
-                AsyncImage(
-                    model              = memory.proof.photoUrl,
-                    contentDescription = "Memory photo",
-                    contentScale       = ContentScale.Crop,
-                    modifier           = Modifier
-                        .fillMaxWidth()
-                        .height(200.dp)
-                        .clip(RoundedCornerShape(topStart = 16.dp, topEnd = 16.dp))
-                )
-            } else {
-                Box(
-                    modifier         = Modifier
-                        .fillMaxWidth()
-                        .height(100.dp)
-                        .background(
-                            Purple.copy(alpha = 0.15f),
-                            RoundedCornerShape(topStart = 16.dp, topEnd = 16.dp)
-                        ),
-                    contentAlignment = Alignment.Center
-                ) {
-                    Text("🎯", fontSize = 36.sp)
+            // Proof photo with gradient overlay
+            Box {
+                if (memory.proof?.photoUrl?.isNotBlank() == true) {
+                    AsyncImage(
+                        model              = memory.proof.photoUrl,
+                        contentDescription = "Memory photo",
+                        contentScale       = ContentScale.Crop,
+                        modifier           = Modifier
+                            .fillMaxWidth()
+                            .height(240.dp)
+                            .clip(RoundedCornerShape(topStart = 24.dp, topEnd = 24.dp))
+                    )
+                } else {
+                    Box(
+                        modifier         = Modifier
+                            .fillMaxWidth()
+                            .height(140.dp)
+                            .background(
+                                Brush.linearGradient(PurpleGradient),
+                                RoundedCornerShape(topStart = 24.dp, topEnd = 24.dp)
+                            ),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Text("🎯", fontSize = 48.sp)
+                    }
+                }
+                
+                // Completed badge on top of image
+                Box(Modifier.align(Alignment.TopEnd).padding(12.dp)) {
+                    LuminousBadge(text = "COMPLETED", color = Teal)
                 }
             }
 
             // Info
-            Column(Modifier.padding(16.dp)) {
+            Column(Modifier.padding(20.dp)) {
                 Text(
                     memory.dare.title,
-                    fontSize   = 16.sp,
-                    fontWeight = FontWeight.Bold,
-                    color      = Color.White
+                    fontSize   = 18.sp,
+                    fontWeight = FontWeight.ExtraBold,
+                    color      = TextPrimary
                 )
 
-                Spacer(Modifier.height(6.dp))
+                Spacer(Modifier.height(8.dp))
 
                 Row(
                     Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceBetween
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
                 ) {
-                    Text(
-                        "Dared by ${memory.dare.daredByName}",
-                        color    = Color.Gray,
-                        fontSize = 12.sp
-                    )
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Box(Modifier.size(6.dp).background(Purple, RoundedCornerShape(2.dp)))
+                        Spacer(Modifier.width(8.dp))
+                        Text(
+                            "Dared by ${memory.dare.daredByName}",
+                            color    = TextSecondary,
+                            fontSize = 13.sp,
+                            fontWeight = FontWeight.Medium
+                        )
+                    }
                     Text(
                         sdf.format(memory.dare.deadline.toDate()),
-                        color    = Color.Gray,
+                        color    = TextSecondary,
                         fontSize = 12.sp
                     )
                 }
 
                 // Caption
                 memory.proof?.caption?.takeIf { it.isNotBlank() }?.let { cap ->
-                    Spacer(Modifier.height(8.dp))
-                    Text(
-                        "\"$cap\"",
-                        color      = Color.White,
-                        fontSize   = 14.sp,
-                        fontStyle  = FontStyle.Italic
-                    )
+                    Spacer(Modifier.height(16.dp))
+                    Box(
+                        Modifier
+                            .fillMaxWidth()
+                            .background(LightBg, RoundedCornerShape(12.dp))
+                            .padding(12.dp)
+                    ) {
+                        Text(
+                            "\"$cap\"",
+                            color      = TextPrimary,
+                            fontSize   = 14.sp,
+                            fontStyle  = FontStyle.Italic,
+                            fontWeight = FontWeight.Medium
+                        )
+                    }
                 }
 
                 // Reactions
                 memory.proof?.reactions?.takeIf { it.isNotEmpty() }?.let { reactions ->
-                    Spacer(Modifier.height(10.dp))
-                    Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
+                    Spacer(Modifier.height(16.dp))
+                    Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                         for ((emoji, list) in reactions.values.groupBy { it }) {
                             Box(
                                 Modifier
-                                    .background(DarkSurface, RoundedCornerShape(20.dp))
-                                    .padding(horizontal = 8.dp, vertical = 3.dp)
+                                    .background(Purple.copy(alpha = 0.05f), RoundedCornerShape(12.dp))
+                                    .padding(horizontal = 10.dp, vertical = 5.dp)
                             ) {
-                                Text("$emoji ${list.size}", fontSize = 12.sp, color = Color.White)
+                                Text("$emoji ${list.size}", fontSize = 13.sp, fontWeight = FontWeight.Bold, color = PurpleDark)
                             }
                         }
                     }
                 }
-
-                // Completed badge
-                Spacer(Modifier.height(10.dp))
-                Box(
-                    Modifier
-                        .background(Teal.copy(alpha = 0.15f), RoundedCornerShape(8.dp))
-                        .padding(horizontal = 10.dp, vertical = 4.dp)
-                ) {
-                    Text("✓ Completed", color = Teal, fontSize = 11.sp)
-                }
-            }
-        }
-    }
-}
-
-@Preview(showBackground = true)
-@Composable
-fun MemoriesEmptyPreview() {
-    DarePackTheme {
-        Box(
-            Modifier
-                .fillMaxSize()
-                .background(DarkBg),
-            contentAlignment = Alignment.Center
-        ) {
-            Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                Text("🏆", fontSize = 48.sp)
-                Spacer(Modifier.height(16.dp))
-                Text(
-                    "No memories yet.",
-                    color = Color.White,
-                    fontSize = 18.sp,
-                    fontWeight = FontWeight.Medium
-                )
             }
         }
     }

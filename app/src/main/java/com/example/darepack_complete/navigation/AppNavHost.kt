@@ -36,6 +36,7 @@ fun AppNavHost(
         composable(Routes.GROUPS) {
             GroupsScreen(
                 onCreateGroup = { navController.navigate(Routes.CREATE_GROUP) },
+                onInviteFriends = { groupId -> navController.navigate(Routes.inviteFriends(groupId)) },
                 onNavHome     = { navController.navigate(Routes.HOME) },
                 onNavBucket   = { navController.navigate(Routes.BUCKET_LIST) },
                 onNavProfile  = { navController.navigate(Routes.PROFILE) }
@@ -68,7 +69,21 @@ fun AppNavHost(
         composable(Routes.CREATE_GROUP) {
             CreateGroupScreen(
                 onBack = { navController.popBackStack() },
-                onGroupCreated = { navController.popBackStack() }
+                onGroupCreated = { groupId -> 
+                    navController.navigate(Routes.inviteFriends(groupId)) {
+                        popUpTo(Routes.CREATE_GROUP) { inclusive = true }
+                    }
+                }
+            )
+        }
+
+        composable(
+            Routes.INVITE_FRIENDS,
+            arguments = listOf(navArgument("groupId") { type = NavType.StringType })
+        ) { back ->
+            InviteFriendsScreen(
+                groupId = back.arguments?.getString("groupId") ?: "",
+                onBack = { navController.popBackStack() }
             )
         }
 

@@ -50,16 +50,16 @@ fun SendDareScreen(
     val sdf = SimpleDateFormat("MMM dd, yyyy", Locale.getDefault())
 
     Scaffold(
-        containerColor = DarkBg,
+        containerColor = LightBg,
         topBar = {
             TopAppBar(
-                title = { Text("Send a dare", color = Color.White, fontWeight = FontWeight.Medium) },
+                title = { Text("Send a dare", color = TextPrimary, fontWeight = FontWeight.Medium) },
                 navigationIcon = {
                     IconButton(onClick = onDareSent) {
-                        Icon(Icons.Default.ArrowBack, contentDescription = "Back", tint = Color.White)
+                        Icon(Icons.Default.ArrowBack, contentDescription = "Back", tint = TextPrimary)
                     }
                 },
-                colors = TopAppBarDefaults.topAppBarColors(containerColor = DarkBg)
+                colors = TopAppBarDefaults.topAppBarColors(containerColor = LightBg)
             )
         }
     ) { padding ->
@@ -74,7 +74,7 @@ fun SendDareScreen(
             // Dare title card
             item {
                 Card(
-                    colors = CardDefaults.cardColors(containerColor = Purple.copy(alpha = 0.15f)),
+                    colors = CardDefaults.cardColors(containerColor = Purple.copy(alpha = 0.1f)),
                     shape  = RoundedCornerShape(12.dp)
                 ) {
                     Column(Modifier.padding(16.dp)) {
@@ -84,12 +84,12 @@ fun SendDareScreen(
                             item?.title ?: "Loading...",
                             fontSize   = 18.sp,
                             fontWeight = FontWeight.Bold,
-                            color      = Color.White
+                            color      = TextPrimary
                         )
                         Text(
                             item?.category ?: "",
                             fontSize = 12.sp,
-                            color    = Color.Gray,
+                            color    = TextSecondary,
                             modifier = Modifier.padding(top = 4.dp)
                         )
                     }
@@ -102,13 +102,13 @@ fun SendDareScreen(
                     "Who do you dare?",
                     fontSize   = 16.sp,
                     fontWeight = FontWeight.Medium,
-                    color      = Color.White
+                    color      = TextPrimary
                 )
             }
 
             if (members.isEmpty()) {
                 item {
-                    Text("No other members in this group yet.", color = Color.Gray, fontSize = 13.sp)
+                    Text("No other members in this group yet.", color = TextSecondary, fontSize = 13.sp)
                 }
             } else {
                 items(members) { user ->
@@ -126,19 +126,19 @@ fun SendDareScreen(
                     "Set a deadline",
                     fontSize   = 16.sp,
                     fontWeight = FontWeight.Medium,
-                    color      = Color.White
+                    color      = TextPrimary
                 )
                 Spacer(Modifier.height(8.dp))
                 Row(
                     modifier          = Modifier
                         .fillMaxWidth()
-                        .background(DarkCard, RoundedCornerShape(12.dp))
+                        .background(LightCard, RoundedCornerShape(12.dp))
                         .clickable { showDatePicker = true }
                         .padding(16.dp),
                     horizontalArrangement = Arrangement.SpaceBetween,
                     verticalAlignment     = Alignment.CenterVertically
                 ) {
-                    Text(sdf.format(Date(deadlineMillis)), color = Color.White, fontSize = 15.sp)
+                    Text(sdf.format(Date(deadlineMillis)), color = TextPrimary, fontSize = 15.sp)
                     Text("Change →", color = Purple, fontSize = 13.sp)
                 }
             }
@@ -155,8 +155,8 @@ fun SendDareScreen(
                             },
                             label  = { Text(label, fontSize = 12.sp) },
                             colors = FilterChipDefaults.filterChipColors(
-                                containerColor = DarkCard,
-                                labelColor     = Color.Gray
+                                containerColor = LightCard,
+                                labelColor     = TextSecondary
                             )
                         )
                     }
@@ -209,7 +209,7 @@ fun MemberPickerRow(user: User, isSelected: Boolean, onClick: () -> Unit) {
         modifier = Modifier
             .fillMaxWidth()
             .background(
-                if (isSelected) Purple.copy(alpha = 0.15f) else DarkCard,
+                if (isSelected) Purple.copy(alpha = 0.1f) else LightCard,
                 RoundedCornerShape(12.dp)
             )
             .border(
@@ -224,7 +224,7 @@ fun MemberPickerRow(user: User, isSelected: Boolean, onClick: () -> Unit) {
         Box(
             modifier         = Modifier
                 .size(40.dp)
-                .background(Purple.copy(alpha = 0.3f), CircleShape),
+                .background(Purple.copy(alpha = 0.15f), CircleShape),
             contentAlignment = Alignment.Center
         ) {
             Text(
@@ -236,8 +236,8 @@ fun MemberPickerRow(user: User, isSelected: Boolean, onClick: () -> Unit) {
         }
         Spacer(Modifier.width(12.dp))
         Column(Modifier.weight(1f)) {
-            Text(user.name, color = Color.White, fontWeight = FontWeight.Medium, fontSize = 14.sp)
-            Text("${user.totalCompleted} dares completed", color = Color.Gray, fontSize = 12.sp)
+            Text(user.name, color = TextPrimary, fontWeight = FontWeight.Medium, fontSize = 14.sp)
+            Text("${user.totalCompleted} dares completed", color = TextSecondary, fontSize = 12.sp)
         }
         if (isSelected) {
             Box(

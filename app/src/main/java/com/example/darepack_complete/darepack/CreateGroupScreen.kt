@@ -24,7 +24,7 @@ import com.example.darepack_complete.viewmodel.CreateGroupViewModel
 @Composable
 fun CreateGroupScreen(
     onBack: () -> Unit,
-    onGroupCreated: () -> Unit,
+    onGroupCreated: (String) -> Unit,
     vm: CreateGroupViewModel = viewModel()
 ) {
     val state by vm.state.collectAsState()
@@ -32,24 +32,25 @@ fun CreateGroupScreen(
 
     LaunchedEffect(state) {
         if (state is CreateGroupState.Success) {
-            onGroupCreated()
+            val groupId = (state as CreateGroupState.Success).groupId
+            onGroupCreated(groupId)
             vm.resetState()
         }
     }
 
     Scaffold(
-        containerColor = DarkBg,
+        containerColor = LightBg,
         topBar = {
             TopAppBar(
                 title = {
-                    Text("Create a group", color = Color.White, fontWeight = FontWeight.Medium)
+                    Text("Create a group", color = TextPrimary, fontWeight = FontWeight.Medium)
                 },
                 navigationIcon = {
                     IconButton(onClick = onBack) {
-                        Icon(Icons.Default.ArrowBack, contentDescription = "Back", tint = Color.White)
+                        Icon(Icons.Default.ArrowBack, contentDescription = "Back", tint = TextPrimary)
                     }
                 },
-                colors = TopAppBarDefaults.topAppBarColors(containerColor = DarkBg)
+                colors = TopAppBarDefaults.topAppBarColors(containerColor = LightBg)
             )
         }
     ) { padding ->
@@ -66,12 +67,12 @@ fun CreateGroupScreen(
                 "Name your crew",
                 fontSize   = 22.sp,
                 fontWeight = FontWeight.Bold,
-                color      = Color.White
+                color      = TextPrimary
             )
             Text(
                 "Give your group a name your friends will recognise.",
                 fontSize = 14.sp,
-                color    = Color.Gray,
+                color    = TextSecondary,
                 modifier = Modifier.padding(top = 8.dp, bottom = 28.dp)
             )
 
@@ -84,11 +85,11 @@ fun CreateGroupScreen(
                 singleLine    = true,
                 colors        = OutlinedTextFieldDefaults.colors(
                     focusedBorderColor   = Purple,
-                    unfocusedBorderColor = Color(0xFF2A2A3A),
+                    unfocusedBorderColor = LightSurface,
                     focusedLabelColor    = Purple,
-                    unfocusedLabelColor  = Color.Gray,
-                    focusedTextColor     = Color.White,
-                    unfocusedTextColor   = Color.White,
+                    unfocusedLabelColor  = TextSecondary,
+                    focusedTextColor     = TextPrimary,
+                    unfocusedTextColor   = TextPrimary,
                     cursorColor          = Purple
                 )
             )
@@ -149,6 +150,8 @@ fun CreateGroupScreen(
 @Composable
 fun CreateGroupScreenPreview() {
     DarePackTheme {
-        CreateGroupScreen(onBack = {}, onGroupCreated = {})
+        Box(Modifier.background(LightBg).fillMaxSize()) {
+            CreateGroupScreen(onBack = {}, onGroupCreated = {})
+        }
     }
 }

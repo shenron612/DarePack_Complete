@@ -17,13 +17,24 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.darepack_complete.models.DarePackModel as Dare
-import com.example.darepack_complete.ui.theme.*
-import com.example.darepack_complete.darepack.DarePackBottomNav
-import com.example.darepack_complete.darepack.NavTab
+import androidx.compose.ui.graphics.Brush
+import com.example.darepack_complete.ui.components.LuminousBadge
+import com.example.darepack_complete.ui.theme.DarePackTheme
+import com.example.darepack_complete.ui.theme.LightBg
+import com.example.darepack_complete.ui.theme.LightCard
+import com.example.darepack_complete.ui.theme.LightSurface
+import com.example.darepack_complete.ui.theme.Pink
+import com.example.darepack_complete.ui.theme.Purple
+import com.example.darepack_complete.ui.theme.PurpleDark
+import com.example.darepack_complete.ui.theme.PurpleGradient
+import com.example.darepack_complete.ui.theme.Teal
+import com.example.darepack_complete.ui.theme.TealGradient
+import com.example.darepack_complete.ui.theme.TextPrimary
+import com.example.darepack_complete.ui.theme.TextSecondary
 import com.example.darepack_complete.viewmodel.HomeViewModel
-import com.google.firebase.Timestamp
+import java.security.Timestamp
 import java.text.SimpleDateFormat
-import java.util.*
+import java.util.Locale
 
 @Composable
 fun HomeScreen(
@@ -37,7 +48,7 @@ fun HomeScreen(
     val sentDares    by vm.sentDares.collectAsState()
 
     Scaffold(
-        containerColor = DarkBg,
+        containerColor = LightBg,
         bottomBar = {
             DarePackBottomNav(
                 current   = NavTab.HOME,
@@ -51,19 +62,25 @@ fun HomeScreen(
         LazyColumn(
             modifier            = Modifier.fillMaxSize().padding(padding),
             contentPadding      = PaddingValues(16.dp),
-            verticalArrangement = Arrangement.spacedBy(10.dp)
+            verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
             item {
-                Text(
-                    "DarePack",
-                    fontSize   = 26.sp,
-                    fontWeight = FontWeight.Bold,
-                    color      = Color.White,
-                    modifier   = Modifier.padding(bottom = 4.dp, top = 8.dp)
-                )
+                Column(modifier = Modifier.padding(bottom = 12.dp, top = 8.dp)) {
+                    Text(
+                        "DarePack",
+                        fontSize   = 32.sp,
+                        fontWeight = FontWeight.ExtraBold,
+                        color      = PurpleDark
+                    )
+                    Text(
+                        "Challenge your friends today",
+                        fontSize = 14.sp,
+                        color = TextSecondary
+                    )
+                }
             }
 
-            item { SectionHeader("Dares for you", pendingDares.size) }
+            item { SectionHeader("Dares for you", pendingDares.size, PurpleGradient) }
 
             if (pendingDares.isEmpty()) {
                 item { EmptyState("No pending dares — dare a friend!") }
@@ -74,8 +91,8 @@ fun HomeScreen(
             }
 
             item {
-                Spacer(Modifier.height(4.dp))
-                SectionHeader("Dares you sent", sentDares.size)
+                Spacer(Modifier.height(8.dp))
+                SectionHeader("Dares you sent", sentDares.size, TealGradient)
             }
 
             if (sentDares.isEmpty()) {
@@ -90,16 +107,16 @@ fun HomeScreen(
 }
 
 @Composable
-fun SectionHeader(title: String, count: Int) {
+fun SectionHeader(title: String, count: Int, gradient: List<Color> = PurpleGradient) {
     Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.padding(vertical = 4.dp)) {
-        Text(title, fontSize = 16.sp, fontWeight = FontWeight.Medium, color = Color.White)
-        Spacer(Modifier.width(8.dp))
+        Text(title, fontSize = 18.sp, fontWeight = FontWeight.Bold, color = TextPrimary)
+        Spacer(Modifier.width(10.dp))
         Box(
             Modifier
-                .background(Purple, RoundedCornerShape(12.dp))
-                .padding(horizontal = 8.dp, vertical = 2.dp)
+                .background(Brush.linearGradient(gradient), RoundedCornerShape(12.dp))
+                .padding(horizontal = 10.dp, vertical = 3.dp)
         ) {
-            Text("$count", fontSize = 11.sp, color = Color.White)
+            Text("$count", fontSize = 12.sp, fontWeight = FontWeight.Bold, color = Color.White)
         }
     }
 }
@@ -108,49 +125,51 @@ fun SectionHeader(title: String, count: Int) {
 fun DareCard(dare: Dare, onClick: () -> Unit) {
     val statusColor = when (dare.status) {
         "completed" -> Teal
-        "expired"   -> Color(0xFFE24B4A)
+        "expired"   -> Pink
         else        -> Purple
     }
     Card(
         modifier = Modifier.fillMaxWidth().clickable(onClick = onClick),
-        colors   = CardDefaults.cardColors(containerColor = DarkCard),
-        shape    = RoundedCornerShape(12.dp)
+        colors   = CardDefaults.cardColors(containerColor = LightCard),
+        shape    = RoundedCornerShape(16.dp),
+        elevation = CardDefaults.cardElevation(defaultElevation = 0.dp),
+        border = CardDefaults.outlinedCardBorder().copy(width = 1.dp, brush = Brush.linearGradient(listOf(Color.Transparent, LightSurface)))
     ) {
-        Column(Modifier.padding(16.dp)) {
+        Column(Modifier.padding(20.dp)) {
             Row(
                 Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment     = Alignment.CenterVertically
+                verticalAlignment     = Alignment.Top
             ) {
                 Text(
                     dare.title,
-                    fontSize   = 15.sp,
-                    fontWeight = FontWeight.Medium,
-                    color      = Color.White,
+                    fontSize   = 16.sp,
+                    fontWeight = FontWeight.Bold,
+                    color      = TextPrimary,
                     modifier   = Modifier.weight(1f)
                 )
-                Box(
-                    Modifier
-                        .background(statusColor.copy(alpha = 0.15f), RoundedCornerShape(8.dp))
-                        .padding(horizontal = 10.dp, vertical = 4.dp)
-                ) {
-                    Text(dare.status, fontSize = 11.sp, color = statusColor)
-                }
+                LuminousBadge(text = dare.status, color = statusColor)
             }
-            Spacer(Modifier.height(6.dp))
-            Text(
-                "From: ${dare.daredByName}  •  To: ${dare.daredToName}",
-                fontSize = 12.sp,
-                color    = Color.Gray
-            )
+            Spacer(Modifier.height(8.dp))
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Box(Modifier.size(8.dp).background(statusColor.copy(alpha = 0.5f), RoundedCornerShape(2.dp)))
+                Spacer(Modifier.width(8.dp))
+                Text(
+                    "From: ${dare.daredByName}  •  To: ${dare.daredToName}",
+                    fontSize = 13.sp,
+                    color    = TextSecondary
+                )
+            }
+            
             if (dare.status == "pending") {
                 val date = SimpleDateFormat("MMM dd, yyyy", Locale.getDefault())
                     .format(dare.deadline.toDate())
+                Divider(Modifier.padding(vertical = 12.dp), color = LightSurface, thickness = 1.dp)
                 Text(
-                    "Deadline: $date",
-                    fontSize = 12.sp,
-                    color    = Color(0xFFFAC775),
-                    modifier = Modifier.padding(top = 4.dp)
+                    "Expires on: $date",
+                    fontSize = 13.sp,
+                    fontWeight = FontWeight.SemiBold,
+                    color    = Purple
                 )
             }
         }
@@ -162,11 +181,11 @@ fun EmptyState(message: String) {
     Box(
         modifier         = Modifier
             .fillMaxWidth()
-            .background(DarkCard, RoundedCornerShape(12.dp))
+            .background(LightCard, RoundedCornerShape(12.dp))
             .padding(20.dp),
         contentAlignment = Alignment.Center
     ) {
-        Text(message, fontSize = 13.sp, color = Color.Gray)
+        Text(message, fontSize = 13.sp, color = TextSecondary)
     }
 }
 
@@ -174,19 +193,21 @@ fun EmptyState(message: String) {
 @Composable
 fun HomeScreenPreview() {
     DarePackTheme {
-        Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(16.dp)) {
-            SectionHeader("Dares for you", 2)
-            DareCard(
-                dare = Dare(
-                    title = "Run 5km",
-                    daredByName = "Alex",
-                    daredToName = "Me",
-                    status = "pending",
-                    deadline = Timestamp.now()
-                ),
-                onClick = {}
-            )
-            EmptyState("No pending dares — dare a friend!")
+        Box(Modifier.background(LightBg).fillMaxSize()) {
+            Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
+                SectionHeader("Dares for you", 2)
+                DareCard(
+                    dare = Dare(
+                        title = "Run 5km",
+                        daredByName = "Alex",
+                        daredToName = "Me",
+                        status = "pending",
+                        deadline = Timestamp.now()
+                    ),
+                    onClick = {}
+                )
+                EmptyState("No pending dares — dare a friend!")
+            }
         }
     }
 }

@@ -13,7 +13,7 @@ import kotlinx.coroutines.tasks.await
 sealed class CreateGroupState {
     object Idle : CreateGroupState()
     object Loading : CreateGroupState()
-    object Success : CreateGroupState()
+    data class Success(val groupId: String) : CreateGroupState()
     data class Error(val message: String) : CreateGroupState()
 }
 
@@ -48,7 +48,7 @@ class CreateGroupViewModel : ViewModel() {
                 // Also add group reference to user's profile
                 db.getReference("Users/$userId/groups").child(groupId).setValue(true).await()
                 
-                _state.value = CreateGroupState.Success
+                _state.value = CreateGroupState.Success(groupId)
             } catch (e: Exception) {
                 _state.value = CreateGroupState.Error(e.message ?: "Unknown error")
             }
