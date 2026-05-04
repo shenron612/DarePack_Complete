@@ -32,7 +32,7 @@ import com.example.darepack_complete.ui.theme.TealGradient
 import com.example.darepack_complete.ui.theme.TextPrimary
 import com.example.darepack_complete.ui.theme.TextSecondary
 import com.example.darepack_complete.viewmodel.HomeViewModel
-import java.security.Timestamp
+import com.google.firebase.Timestamp
 import java.text.SimpleDateFormat
 import java.util.Locale
 
@@ -164,7 +164,7 @@ fun DareCard(dare: Dare, onClick: () -> Unit) {
             if (dare.status == "pending") {
                 val date = SimpleDateFormat("MMM dd, yyyy", Locale.getDefault())
                     .format(dare.deadline.toDate())
-                Divider(Modifier.padding(vertical = 12.dp), color = LightSurface, thickness = 1.dp)
+                HorizontalDivider(Modifier.padding(vertical = 12.dp), color = LightSurface, thickness = 1.dp)
                 Text(
                     "Expires on: $date",
                     fontSize = 13.sp,
