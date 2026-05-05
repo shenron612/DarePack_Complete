@@ -24,8 +24,12 @@ class GroupsViewModel : ViewModel() {
     private val _members = MutableStateFlow<List<UserModel>>(emptyList())
     val members: StateFlow<List<UserModel>> = _members
 
+    private val _allGroups = MutableStateFlow<List<Group>>(emptyList())
+    val allGroups: StateFlow<List<Group>> = _allGroups
+
     init {
         loadUserGroups()
+        loadAllGroups()
     }
 
     private fun loadUserGroups() {
@@ -34,6 +38,16 @@ class GroupsViewModel : ViewModel() {
             override fun onDataChange(snapshot: DataSnapshot) {
                 val groupIds = snapshot.children.mapNotNull { it.key }
                 fetchGroupsDetails(groupIds)
+            }
+            override fun onCancelled(error: DatabaseError) {}
+        })
+    }
+
+    private fun loadAllGroups() {
+        db.getReference("Groups").addValueEventListener(object : ValueEventListener {
+            override fun onDataChange(snapshot: DataSnapshot) {
+                val groups = snapshot.children.mapNotNull { it.getValue(Group::class.java) }
+                _allGroups.value = groups
             }
             override fun onCancelled(error: DatabaseError) {}
         })
@@ -65,20 +79,30 @@ class GroupsViewModel : ViewModel() {
         }
     }
 
-    fun joinGroup(groupId: String) {
+    fun joinGroup(input: String) {
         val userId = auth.currentUser?.uid ?: return
         viewModelScope.launch {
             try {
+                // First try to find by Invite Code
+                val query = db.getReference("Groups")
+                    .orderByChild("inviteCode")
+                    .equalTo(input)
+                    .get().await()
+
+                val groupSnapshot = query.children.firstOrNull()
+                val group = groupSnapshot?.getValue(Group::class.java)
+                val groupId = group?.groupId ?: input // Fallback to input as ID if no match
+
                 val groupRef = db.getReference("Groups/$groupId")
-                val group = groupRef.get().await().getValue(Group::class.java) ?: return@launch
+                val finalGroup = group ?: groupRef.get().await().getValue(Group::class.java) ?: return@launch
                 
-                if (!group.members.contains(userId)) {
-                    val newMembers = group.members + userId
+                if (!finalGroup.members.contains(userId)) {
+                    val newMembers = finalGroup.members + userId
                     groupRef.child("members").setValue(newMembers).await()
                     db.getReference("Users/$userId/groups").child(groupId).setValue(true).await()
                 }
             } catch (e: Exception) {
-                // Handle error
+                e.printStackTrace()
             }
         }
     }

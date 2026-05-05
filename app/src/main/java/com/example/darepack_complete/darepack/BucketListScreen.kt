@@ -19,16 +19,13 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.darepack_complete.models.BucketItem
 import com.example.darepack_complete.ui.theme.*
-import com.example.darepack_complete.darepack.DarePackBottomNav
-import com.example.darepack_complete.darepack.NavTab
 import com.example.darepack_complete.viewmodel.BucketListViewModel
-import com.example.darepack_complete.ui.components.LuminousBadge
+import com.example.darepack_complete.ui.components.*
 
 val CATEGORIES = listOf("Adventure", "Food", "Travel", "Social", "Creative", "Fitness", "Other")
 
@@ -53,7 +50,7 @@ fun BucketListScreen(
     }
 
     Scaffold(
-        containerColor = LightBg,
+        containerColor = CyberDark,
         floatingActionButton = {
             if (selectedGroupId.isNotBlank()) {
                 LargeFloatingActionButton(
@@ -61,7 +58,7 @@ fun BucketListScreen(
                     containerColor = Color.Transparent,
                     contentColor   = Color.White,
                     shape          = RoundedCornerShape(20.dp),
-                    modifier       = Modifier.background(Brush.linearGradient(PurpleGradient), RoundedCornerShape(20.dp))
+                    modifier       = Modifier.background(Brush.linearGradient(CyberGradient), RoundedCornerShape(20.dp))
                 ) {
                     Icon(Icons.Default.Add, contentDescription = "Add item", modifier = Modifier.size(32.dp))
                 }
@@ -77,73 +74,74 @@ fun BucketListScreen(
             )
         }
     ) { padding ->
-        LazyColumn(
-            modifier            = Modifier.fillMaxSize().padding(padding),
-            contentPadding      = PaddingValues(16.dp),
-            verticalArrangement = Arrangement.spacedBy(16.dp)
-        ) {
-            item {
-                Column(modifier = Modifier.padding(bottom = 8.dp, top = 8.dp)) {
-                    Text("Bucket List", fontSize = 32.sp, fontWeight = FontWeight.ExtraBold, color = PurpleDark)
-                    Text("Collective challenges for your pack", fontSize = 14.sp, color = TextSecondary)
-                }
-            }
-
-            // Suggestions section
-            item {
-                Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.padding(bottom = 8.dp)) {
-                    Icon(Icons.Default.Info, null, tint = Yellow, modifier = Modifier.size(20.dp))
-                    Spacer(Modifier.width(8.dp))
-                    Text("Top Suggestions", color = TextPrimary, fontSize = 18.sp, fontWeight = FontWeight.Bold)
-                }
-                LazyRow(
-                    horizontalArrangement = Arrangement.spacedBy(12.dp),
-                    contentPadding = PaddingValues(bottom = 8.dp)
-                ) {
-                    items(suggestions) { suggestion ->
-                        SuggestionCard(
-                            item = suggestion,
-                            onClick = { if (selectedGroupId.isNotBlank()) vm.addItem(suggestion.title, suggestion.category) }
-                        )
-                    }
-                }
-            }
-
-            item {
-                Text("Select Group", color = TextPrimary, fontSize = 18.sp, fontWeight = FontWeight.Bold, modifier = Modifier.padding(bottom = 8.dp))
-                LazyRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                    items(groups) { group ->
-                        FilterChip(
-                            selected = selectedGroupId == group.groupId,
-                            onClick  = { vm.selectGroup(group.groupId) },
-                            label    = { Text(group.name) },
-                            shape    = RoundedCornerShape(12.dp),
-                            colors   = FilterChipDefaults.filterChipColors(
-                                selectedContainerColor = Purple,
-                                selectedLabelColor     = Color.White,
-                                containerColor         = LightCard,
-                                labelColor             = TextSecondary
-                            ),
-                            border = FilterChipDefaults.filterChipBorder(enabled = true, selected = selectedGroupId == group.groupId, borderColor = LightSurface, selectedBorderColor = Purple)
-                        )
-                    }
-                }
-            }
-
-            if (items.isEmpty()) {
+        Box(modifier = Modifier.fillMaxSize().padding(padding)) {
+            CyberBackground()
+            
+            LazyColumn(
+                modifier            = Modifier.fillMaxSize(),
+                contentPadding      = PaddingValues(16.dp),
+                verticalArrangement = Arrangement.spacedBy(16.dp)
+            ) {
                 item {
-                    Box(
-                        Modifier.fillMaxWidth()
-                            .background(LightCard, RoundedCornerShape(16.dp))
-                            .padding(40.dp),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        Text("No items yet. Tap + to add one!", color = TextSecondary, fontSize = 14.sp)
+                    Column(modifier = Modifier.padding(bottom = 8.dp, top = 8.dp)) {
+                        Text("Bucket List", fontSize = 32.sp, fontWeight = FontWeight.ExtraBold, color = CyberText)
+                        Text("Collective challenges for your pack", fontSize = 14.sp, color = CyberBlue.copy(alpha = 0.7f))
                     }
                 }
-            } else {
-                items(items) { item ->
-                    BucketItemCard(item = item, onClick = { onSendDare(item.itemId, selectedGroupId) })
+
+                // Suggestions section
+                item {
+                    Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.padding(bottom = 8.dp)) {
+                        Icon(Icons.Default.Info, null, tint = Yellow, modifier = Modifier.size(20.dp))
+                        Spacer(Modifier.width(8.dp))
+                        Text("Top Suggestions", color = CyberText, fontSize = 18.sp, fontWeight = FontWeight.Bold)
+                    }
+                    LazyRow(
+                        horizontalArrangement = Arrangement.spacedBy(12.dp),
+                        contentPadding = PaddingValues(bottom = 8.dp)
+                    ) {
+                        items(suggestions) { suggestion ->
+                            SuggestionCard(
+                                item = suggestion,
+                                onClick = { if (selectedGroupId.isNotBlank()) vm.addItem(suggestion.title, suggestion.category) }
+                            )
+                        }
+                    }
+                }
+
+                item {
+                    Text("Select Group", color = CyberText, fontSize = 18.sp, fontWeight = FontWeight.Bold, modifier = Modifier.padding(bottom = 8.dp))
+                    LazyRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                        items(groups) { group ->
+                            FilterChip(
+                                selected = selectedGroupId == group.groupId,
+                                onClick  = { vm.selectGroup(group.groupId) },
+                                label    = { Text(group.name) },
+                                shape    = RoundedCornerShape(12.dp),
+                                colors   = FilterChipDefaults.filterChipColors(
+                                    selectedContainerColor = CyberBlue,
+                                    selectedLabelColor     = Color.White,
+                                    containerColor         = CyberSurface,
+                                    labelColor             = CyberText.copy(alpha = 0.6f)
+                                ),
+                                border = FilterChipDefaults.filterChipBorder(enabled = true, selected = selectedGroupId == group.groupId, borderColor = CyberBlue.copy(alpha = 0.2f), selectedBorderColor = CyberBlue)
+                            )
+                        }
+                    }
+                }
+
+                if (items.isEmpty()) {
+                    item {
+                        CyberCard(Modifier.fillMaxWidth().padding(vertical = 32.dp)) {
+                            Box(Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
+                                Text("No items yet. Tap + to add one!", color = CyberText.copy(alpha = 0.5f), fontSize = 14.sp)
+                            }
+                        }
+                    }
+                } else {
+                    items(items) { item ->
+                        BucketItemCard(item = item, onClick = { onSendDare(item.itemId, selectedGroupId) })
+                    }
                 }
             }
         }
@@ -159,27 +157,23 @@ fun BucketListScreen(
 
 @Composable
 fun SuggestionCard(item: BucketItem, onClick: () -> Unit) {
-    Card(
+    CyberCard(
         modifier = Modifier
-            .width(180.dp)
-            .clickable(onClick = onClick),
-        colors = CardDefaults.cardColors(containerColor = LightCard),
-        shape = RoundedCornerShape(20.dp),
-        elevation = CardDefaults.cardElevation(defaultElevation = 0.dp),
-        border = CardDefaults.outlinedCardBorder().copy(width = 1.dp, brush = Brush.linearGradient(listOf(LightSurface, Color.Transparent)))
+            .width(180.dp),
+        onClick = onClick
     ) {
-        Column(Modifier.padding(16.dp)) {
-            Box(Modifier.background(Purple.copy(alpha = 0.1f), CircleShape).padding(horizontal = 10.dp, vertical = 4.dp)) {
-                Text(item.category, color = Purple, fontSize = 10.sp, fontWeight = FontWeight.Bold)
+        Column {
+            Box(Modifier.background(CyberBlue.copy(alpha = 0.1f), CircleShape).padding(horizontal = 10.dp, vertical = 4.dp)) {
+                Text(item.category, color = CyberBlue, fontSize = 10.sp, fontWeight = FontWeight.Bold)
             }
             Spacer(Modifier.height(12.dp))
-            Text(item.title, color = TextPrimary, fontWeight = FontWeight.Bold, fontSize = 15.sp, maxLines = 2, minLines = 2)
+            Text(item.title, color = CyberText, fontWeight = FontWeight.Bold, fontSize = 15.sp, maxLines = 2, minLines = 2)
             Spacer(Modifier.height(16.dp))
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(36.dp)
-                    .background(Brush.linearGradient(PurpleGradient), RoundedCornerShape(12.dp)),
+                    .background(Brush.linearGradient(CyberGradient), RoundedCornerShape(12.dp)),
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.Center
             ) {
@@ -194,34 +188,31 @@ fun SuggestionCard(item: BucketItem, onClick: () -> Unit) {
 @Composable
 fun BucketItemCard(item: BucketItem, onClick: () -> Unit) {
     val catColor = when (item.category) {
-        "Adventure" -> Purple
+        "Adventure" -> CyberBlue
         "Food"      -> Yellow
-        "Travel"    -> Teal
+        "Travel"    -> CyberBlue
         "Social"    -> Pink
-        "Fitness"   -> Color(0xFF10B981) // Vibrant Green
+        "Fitness"   -> Color(0xFF10B981)
         else        -> Color.Gray
     }
-    Card(
-        modifier = Modifier.fillMaxWidth().clickable(onClick = onClick),
-        colors   = CardDefaults.cardColors(containerColor = LightCard),
-        shape    = RoundedCornerShape(16.dp),
-        elevation = CardDefaults.cardElevation(defaultElevation = 0.dp),
-        border = CardDefaults.outlinedCardBorder().copy(width = 1.dp, brush = Brush.linearGradient(listOf(Color.Transparent, LightSurface)))
+    CyberCard(
+        modifier = Modifier.fillMaxWidth(),
+        onClick = onClick
     ) {
         Row(
-            Modifier.fillMaxWidth().padding(20.dp),
+            modifier = Modifier.fillMaxWidth(),
             verticalAlignment     = Alignment.CenterVertically
         ) {
             Column(Modifier.weight(1f)) {
-                Text(item.title, color = TextPrimary, fontWeight = FontWeight.Bold, fontSize = 16.sp)
+                Text(item.title, color = CyberText, fontWeight = FontWeight.Bold, fontSize = 16.sp)
                 Spacer(Modifier.height(6.dp))
                 LuminousBadge(text = item.category, color = catColor)
             }
             Box(
-                Modifier.size(36.dp).background(Purple.copy(alpha = 0.1f), CircleShape),
+                Modifier.size(36.dp).background(CyberBlue.copy(alpha = 0.1f), CircleShape),
                 contentAlignment = Alignment.Center
             ) {
-                Icon(Icons.Default.ArrowForward, null, tint = Purple, modifier = Modifier.size(20.dp))
+                Icon(Icons.Default.ArrowForward, null, tint = CyberBlue, modifier = Modifier.size(20.dp))
             }
         }
     }
@@ -234,8 +225,8 @@ fun AddItemDialog(onDismiss: () -> Unit, onAdd: (String, String) -> Unit) {
 
     AlertDialog(
         onDismissRequest = onDismiss,
-        containerColor   = LightCard,
-        title = { Text("Add Challenge", color = TextPrimary, fontWeight = FontWeight.Bold) },
+        containerColor   = CyberSurface,
+        title = { Text("Add Challenge", color = CyberText, fontWeight = FontWeight.Bold) },
         text  = {
             Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
                 OutlinedTextField(
@@ -245,15 +236,16 @@ fun AddItemDialog(onDismiss: () -> Unit, onAdd: (String, String) -> Unit) {
                     modifier      = Modifier.fillMaxWidth(),
                     shape         = RoundedCornerShape(16.dp),
                     colors        = OutlinedTextFieldDefaults.colors(
-                        focusedBorderColor   = Purple,
-                        unfocusedBorderColor = LightSurface,
-                        focusedLabelColor    = Purple,
-                        unfocusedLabelColor  = TextSecondary,
-                        focusedTextColor     = TextPrimary,
-                        unfocusedTextColor   = TextPrimary
+                        focusedBorderColor   = CyberBlue,
+                        unfocusedBorderColor = CyberBlue.copy(alpha = 0.3f),
+                        focusedLabelColor    = CyberBlue,
+                        unfocusedLabelColor  = CyberBlue.copy(alpha = 0.6f),
+                        focusedTextColor     = CyberText,
+                        unfocusedTextColor   = CyberText,
+                        cursorColor          = CyberBlue
                     )
                 )
-                Text("Category", color = TextPrimary, fontSize = 14.sp, fontWeight = FontWeight.Bold)
+                Text("Category", color = CyberText, fontSize = 14.sp, fontWeight = FontWeight.Bold)
                 LazyRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                     items(CATEGORIES) { cat ->
                         FilterChip(
@@ -262,11 +254,12 @@ fun AddItemDialog(onDismiss: () -> Unit, onAdd: (String, String) -> Unit) {
                             label    = { Text(cat, fontSize = 12.sp) },
                             shape    = RoundedCornerShape(12.dp),
                             colors   = FilterChipDefaults.filterChipColors(
-                                selectedContainerColor = Purple,
+                                selectedContainerColor = CyberBlue,
                                 selectedLabelColor     = Color.White,
-                                containerColor         = LightSurface,
-                                labelColor             = TextSecondary
-                            )
+                                containerColor         = CyberDark,
+                                labelColor             = CyberText.copy(alpha = 0.6f)
+                            ),
+                            border = FilterChipDefaults.filterChipBorder(enabled = true, selected = category == cat, borderColor = CyberBlue.copy(alpha = 0.2f), selectedBorderColor = CyberBlue)
                         )
                     }
                 }
@@ -276,14 +269,14 @@ fun AddItemDialog(onDismiss: () -> Unit, onAdd: (String, String) -> Unit) {
             Button(
                 onClick = { if (title.isNotBlank()) onAdd(title, category) },
                 enabled = title.isNotBlank(),
-                colors = ButtonDefaults.buttonColors(containerColor = Purple),
+                colors = ButtonDefaults.buttonColors(containerColor = CyberBlue),
                 shape = RoundedCornerShape(12.dp)
             ) {
                 Text("Add")
             }
         },
         dismissButton = {
-            TextButton(onClick = onDismiss) { Text("Cancel", color = Color.Gray) }
+            TextButton(onClick = onDismiss) { Text("Cancel", color = CyberText.copy(alpha = 0.5f)) }
         }
     )
 }

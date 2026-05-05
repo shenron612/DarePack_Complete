@@ -70,6 +70,7 @@ class BucketListViewModel : ViewModel() {
                 }
             }
             _groups.value = fetchedGroups
+            // Only auto-select if nothing is selected yet
             if (_selectedGroupId.value.isBlank() && fetchedGroups.isNotEmpty()) {
                 selectGroup(fetchedGroups.first().groupId)
             }
@@ -77,15 +78,18 @@ class BucketListViewModel : ViewModel() {
     }
 
     fun selectGroup(groupId: String) {
+        if (groupId == _selectedGroupId.value && itemsListener != null) return
+        
+        // Remove old listener if exists
+        itemsListener?.let {
+            db.getReference("Groups/${_selectedGroupId.value}/bucketList").removeEventListener(it)
+        }
+
         _selectedGroupId.value = groupId
         loadItems(groupId)
     }
 
     private fun loadItems(groupId: String) {
-        itemsListener?.let {
-            db.getReference("Groups/${_selectedGroupId.value}/bucketList").removeEventListener(it)
-        }
-
         itemsListener = object : ValueEventListener {
             override fun onDataChange(snapshot: DataSnapshot) {
                 val bucketItems = snapshot.children.mapNotNull { it.getValue(BucketItem::class.java) }
@@ -99,7 +103,10 @@ class BucketListViewModel : ViewModel() {
 
     fun addItem(title: String, category: String) {
         val groupId = _selectedGroupId.value
-        if (groupId.isBlank()) return
+        if (groupId.isBlank()) {
+            println("DEBUG: Cannot add item - No group selected")
+            return
+        }
 
         viewModelScope.launch {
             try {
@@ -107,8 +114,9 @@ class BucketListViewModel : ViewModel() {
                 val itemId = itemRef.key ?: return@launch
                 val newItem = BucketItem(itemId = itemId, title = title, category = category)
                 itemRef.setValue(newItem).await()
+                println("DEBUG: Successfully added $title to group $groupId")
             } catch (e: Exception) {
-                // Handle error
+                e.printStackTrace()
             }
         }
     }

@@ -8,7 +8,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.Share
 import androidx.compose.material3.*
@@ -26,6 +26,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.darepack_complete.models.UserModel
 import com.example.darepack_complete.ui.theme.*
 import com.example.darepack_complete.viewmodel.InviteFriendsViewModel
+import com.example.darepack_complete.ui.components.*
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -44,125 +45,125 @@ fun InviteFriendsScreen(
     LaunchedEffect(groupId) { vm.loadGroup(groupId) }
 
     Scaffold(
-        containerColor = LightBg,
+        containerColor = CyberDark,
         topBar = {
             TopAppBar(
-                title = { Text("Invite Friends", color = TextPrimary) },
+                title = { Text("Invite Friends", color = CyberText, fontWeight = FontWeight.Bold) },
                 navigationIcon = {
                     IconButton(onClick = onBack) {
-                        Icon(Icons.Default.ArrowBack, "Back", tint = TextPrimary)
+                        Icon(Icons.AutoMirrored.Filled.ArrowBack, "Back", tint = CyberText)
                     }
                 },
-                colors = TopAppBarDefaults.topAppBarColors(containerColor = LightBg)
+                colors = TopAppBarDefaults.topAppBarColors(containerColor = CyberDark)
             )
         }
     ) { padding ->
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(padding)
-                .padding(horizontal = 24.dp)
-        ) {
-            Spacer(Modifier.height(16.dp))
+        Box(modifier = Modifier.fillMaxSize().padding(padding)) {
+            CyberBackground()
             
-            // Invite Code Card
-            Card(
-                colors = CardDefaults.cardColors(containerColor = LightCard),
-                shape = RoundedCornerShape(16.dp),
-                elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(horizontal = 24.dp)
             ) {
-                Column(
-                    modifier = Modifier.padding(20.dp),
-                    horizontalAlignment = Alignment.CenterHorizontally
-                ) {
-                    Text("Share Invite Code", color = TextSecondary, fontSize = 14.sp)
-                    Text(
-                        group?.inviteCode ?: "......",
-                        fontSize = 32.sp,
-                        fontWeight = FontWeight.Bold,
-                        color = TextPrimary,
-                        modifier = Modifier.padding(vertical = 12.dp)
-                    )
-                    
-                    Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-                        Button(
-                            onClick = { 
-                                group?.inviteCode?.let { 
-                                    clipboard.setText(AnnotatedString(it))
-                                }
-                            },
-                            colors = ButtonDefaults.buttonColors(
-                                containerColor = Purple.copy(alpha = 0.2f),
-                                contentColor = Purple
-                            ),
-                            shape = RoundedCornerShape(12.dp)
-                        ) {
-                            Text("Copy Code")
-                        }
+                Spacer(Modifier.height(16.dp))
+                
+                // Invite Code Card
+                CyberCard(modifier = Modifier.fillMaxWidth()) {
+                    Column(
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        Text("Share Invite Code", color = CyberBlue.copy(alpha = 0.7f), fontSize = 14.sp)
+                        Text(
+                            group?.inviteCode ?: "......",
+                            fontSize = 32.sp,
+                            fontWeight = FontWeight.Bold,
+                            color = CyberText,
+                            modifier = Modifier.padding(vertical = 12.dp)
+                        )
                         
-                        Button(
-                            onClick = {
-                                val sendIntent: Intent = Intent().apply {
-                                    action = Intent.ACTION_SEND
-                                    putExtra(Intent.EXTRA_TEXT, "Join my DarePack crew! Use code: ${group?.inviteCode}")
-                                    type = "text/plain"
-                                }
-                                val shareIntent = Intent.createChooser(sendIntent, null)
-                                context.startActivity(shareIntent)
-                            },
-                            colors = ButtonDefaults.buttonColors(containerColor = Purple),
-                            shape = RoundedCornerShape(12.dp)
-                        ) {
-                            Icon(Icons.Default.Share, null, Modifier.size(18.dp))
-                            Spacer(Modifier.width(8.dp))
-                            Text("Share Link")
+                        Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+                            Button(
+                                onClick = { 
+                                    group?.inviteCode?.let { 
+                                        clipboard.setText(AnnotatedString(it))
+                                    }
+                                },
+                                colors = ButtonDefaults.buttonColors(
+                                    containerColor = CyberBlue.copy(alpha = 0.1f),
+                                    contentColor = CyberBlue
+                                ),
+                                shape = RoundedCornerShape(12.dp),
+                                border = FilterChipDefaults.filterChipBorder(enabled = true, selected = false, borderColor = CyberBlue.copy(alpha = 0.3f))
+                            ) {
+                                Text("Copy Code")
+                            }
+                            
+                            GradientButton(
+                                text = "Share Link",
+                                onClick = {
+                                    val sendIntent: Intent = Intent().apply {
+                                        action = Intent.ACTION_SEND
+                                        putExtra(Intent.EXTRA_TEXT, "Join my DarePack crew! Use code: ${group?.inviteCode}")
+                                        type = "text/plain"
+                                    }
+                                    val shareIntent = Intent.createChooser(sendIntent, null)
+                                    context.startActivity(shareIntent)
+                                },
+                                modifier = Modifier.weight(1f),
+                                gradient = CyberGradient
+                            )
                         }
                     }
                 }
-            }
 
-            Spacer(Modifier.height(32.dp))
-            
-            Text("Find on DarePack", color = TextPrimary, fontSize = 18.sp, fontWeight = FontWeight.Bold)
-            Text("Invite friends who already have an account.", color = TextSecondary, fontSize = 14.sp)
-            
-            Spacer(Modifier.height(16.dp))
-            
-            OutlinedTextField(
-                value = query,
-                onValueChange = { 
-                    query = it
-                    vm.searchUsers(it)
-                },
-                placeholder = { Text("Search by email...") },
-                modifier = Modifier.fillMaxWidth(),
-                leadingIcon = { Icon(Icons.Default.Search, null, tint = TextSecondary) },
-                singleLine = true,
-                colors = OutlinedTextFieldDefaults.colors(
-                    focusedBorderColor = Purple,
-                    unfocusedBorderColor = LightSurface,
-                    focusedTextColor = TextPrimary,
-                    unfocusedTextColor = TextPrimary
-                ),
-                shape = RoundedCornerShape(12.dp)
-            )
-            
-            Spacer(Modifier.height(16.dp))
-            
-            LazyColumn(verticalArrangement = Arrangement.spacedBy(12.dp)) {
-                items(searchResults) { user ->
-                    val isMember = group?.members?.contains(user.userId) == true
-                    UserInviteRow(
-                        user = user, 
-                        isMember = isMember,
-                        onInvite = { vm.inviteUser(user.userId) }
-                    )
+                Spacer(Modifier.height(32.dp))
+                
+                Text("Find on DarePack", color = CyberText, fontSize = 18.sp, fontWeight = FontWeight.Bold)
+                Text("Invite friends who already have an account.", color = CyberBlue.copy(alpha = 0.7f), fontSize = 14.sp)
+                
+                Spacer(Modifier.height(16.dp))
+                
+                OutlinedTextField(
+                    value = query,
+                    onValueChange = { 
+                        query = it
+                        vm.searchUsers(it)
+                    },
+                    placeholder = { Text("Search by email...") },
+                    modifier = Modifier.fillMaxWidth(),
+                    leadingIcon = { Icon(Icons.Default.Search, null, tint = CyberBlue.copy(alpha = 0.6f)) },
+                    singleLine = true,
+                    colors = OutlinedTextFieldDefaults.colors(
+                        focusedBorderColor = CyberBlue,
+                        unfocusedBorderColor = CyberBlue.copy(alpha = 0.3f),
+                        focusedTextColor = CyberText,
+                        unfocusedTextColor = CyberText,
+                        focusedLabelColor = CyberBlue,
+                        unfocusedLabelColor = CyberBlue.copy(alpha = 0.6f),
+                        cursorColor = CyberBlue
+                    ),
+                    shape = RoundedCornerShape(12.dp)
+                )
+                
+                Spacer(Modifier.height(16.dp))
+                
+                LazyColumn(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+                    items(searchResults) { user ->
+                        val isMember = group?.members?.contains(user.userId) == true
+                        UserInviteRow(
+                            user = user, 
+                            isMember = isMember,
+                            onInvite = { vm.inviteUser(user.userId) }
+                        )
+                    }
                 }
-            }
-            
-            if (query.isNotEmpty() && searchResults.isEmpty()) {
-                Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                    Text("No users found", color = TextSecondary)
+                
+                if (query.isNotEmpty() && searchResults.isEmpty()) {
+                    Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                        Text("No users found", color = CyberBlue.copy(alpha = 0.5f))
+                    }
                 }
             }
         }
@@ -171,30 +172,28 @@ fun InviteFriendsScreen(
 
 @Composable
 fun UserInviteRow(user: UserModel, isMember: Boolean, onInvite: () -> Unit) {
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .background(LightCard, RoundedCornerShape(12.dp))
-            .padding(12.dp),
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        Box(
-            modifier = Modifier.size(40.dp).background(Purple.copy(alpha = 0.15f), CircleShape),
-            contentAlignment = Alignment.Center
+    CyberCard(modifier = Modifier.fillMaxWidth()) {
+        Row(
+            verticalAlignment = Alignment.CenterVertically
         ) {
-            Text(user.name.firstOrNull()?.toString() ?: "?", color = Purple, fontWeight = FontWeight.Bold)
-        }
-        Spacer(Modifier.width(12.dp))
-        Column(Modifier.weight(1f)) {
-            Text(user.name, color = TextPrimary, fontWeight = FontWeight.Medium)
-            Text(user.email, color = TextSecondary, fontSize = 12.sp)
-        }
-        
-        if (isMember) {
-            Text("Member", color = Teal, fontSize = 13.sp)
-        } else {
-            TextButton(onClick = onInvite) {
-                Text("Add", color = Purple)
+            Box(
+                modifier = Modifier.size(40.dp).background(CyberBlue.copy(alpha = 0.15f), CircleShape),
+                contentAlignment = Alignment.Center
+            ) {
+                Text(user.name.firstOrNull()?.toString() ?: "?", color = CyberBlue, fontWeight = FontWeight.Bold)
+            }
+            Spacer(Modifier.width(12.dp))
+            Column(Modifier.weight(1f)) {
+                Text(user.name, color = CyberText, fontWeight = FontWeight.Medium)
+                Text(user.email, color = CyberBlue.copy(alpha = 0.6f), fontSize = 12.sp)
+            }
+            
+            if (isMember) {
+                LuminousBadge(text = "Member", color = CyberBlue)
+            } else {
+                TextButton(onClick = onInvite) {
+                    Text("Add", color = CyberBlue, fontWeight = FontWeight.Bold)
+                }
             }
         }
     }

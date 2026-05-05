@@ -2,6 +2,14 @@ package com.example.darepack_complete.ui.theme
 
 import androidx.compose.ui.graphics.Color
 
+// Cyber/Aero Theme Colors
+val CyberDark = Color(0xFF051622)
+val CyberBlue = Color(0xFF00A8E8)
+val CyberSurface = Color(0xFF12263F)
+val CyberText = Color(0xFFF1F5F9)
+
+val CyberGradient = listOf(CyberBlue, Color(0xFF0077B6))
+
 // Core Luminous Accents
 val Purple = Color(0xFF8B5CF6) // Luminous Violet
 val PurpleDark = Color(0xFF6D28D9)

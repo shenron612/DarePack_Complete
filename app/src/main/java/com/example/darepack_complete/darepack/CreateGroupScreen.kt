@@ -2,22 +2,24 @@ package com.example.darepack_complete.darepack
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.darepack_complete.ui.theme.*
 import com.example.darepack_complete.viewmodel.CreateGroupState
 import com.example.darepack_complete.viewmodel.CreateGroupViewModel
+import com.example.darepack_complete.ui.components.*
 
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -39,119 +41,100 @@ fun CreateGroupScreen(
     }
 
     Scaffold(
-        containerColor = LightBg,
+        containerColor = CyberDark,
         topBar = {
             TopAppBar(
                 title = {
-                    Text("Create a group", color = TextPrimary, fontWeight = FontWeight.Medium)
+                    Text("Create a group", color = CyberText, fontWeight = FontWeight.Bold)
                 },
                 navigationIcon = {
                     IconButton(onClick = onBack) {
-                        Icon(Icons.Default.ArrowBack, contentDescription = "Back", tint = TextPrimary)
+                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back", tint = CyberText)
                     }
                 },
-                colors = TopAppBarDefaults.topAppBarColors(containerColor = LightBg)
+                colors = TopAppBarDefaults.topAppBarColors(containerColor = CyberDark)
             )
         }
     ) { padding ->
-        Column(
-            modifier            = Modifier
-                .fillMaxSize()
-                .padding(padding)
-                .padding(horizontal = 24.dp),
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-            Spacer(Modifier.height(16.dp))
-
-            Text(
-                "Name your crew",
-                fontSize   = 22.sp,
-                fontWeight = FontWeight.Bold,
-                color      = TextPrimary
-            )
-            Text(
-                "Give your group a name your friends will recognise.",
-                fontSize = 14.sp,
-                color    = TextSecondary,
-                modifier = Modifier.padding(top = 8.dp, bottom = 28.dp)
-            )
-
-            OutlinedTextField(
-                value         = name,
-                onValueChange = { name = it },
-                label         = { Text("Group name") },
-                placeholder   = { Text("e.g. Squad Goals") },
-                modifier      = Modifier.fillMaxWidth(),
-                singleLine    = true,
-                colors        = OutlinedTextFieldDefaults.colors(
-                    focusedBorderColor   = Purple,
-                    unfocusedBorderColor = LightSurface,
-                    focusedLabelColor    = Purple,
-                    unfocusedLabelColor  = TextSecondary,
-                    focusedTextColor     = TextPrimary,
-                    unfocusedTextColor   = TextPrimary,
-                    cursorColor          = Purple
-                )
-            )
-
-            Spacer(Modifier.height(16.dp))
-
-            // Info box
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .background(Purple.copy(alpha = 0.1f), RoundedCornerShape(12.dp))
-                    .padding(16.dp)
+        Box(modifier = Modifier.fillMaxSize().padding(padding)) {
+            CyberBackground()
+            
+            Column(
+                modifier            = Modifier
+                    .fillMaxSize()
+                    .verticalScroll(rememberScrollState())
+                    .padding(horizontal = 24.dp),
+                horizontalAlignment = Alignment.CenterHorizontally
             ) {
+                Spacer(Modifier.height(16.dp))
+
                 Text(
-                    "After creating the group, share the Group ID with friends so they can join from the Groups screen.",
-                    fontSize = 13.sp,
-                    color    = Purple
+                    "Name your crew",
+                    fontSize   = 22.sp,
+                    fontWeight = FontWeight.Bold,
+                    color      = CyberText
                 )
-            }
-
-            Spacer(Modifier.weight(1f))
-
-            if (state is CreateGroupState.Error) {
                 Text(
-                    (state as CreateGroupState.Error).message,
-                    color    = MaterialTheme.colorScheme.error,
-                    fontSize = 13.sp,
-                    modifier = Modifier.padding(bottom = 12.dp)
+                    "Give your group a name your friends will recognise.",
+                    fontSize = 14.sp,
+                    color    = CyberBlue.copy(alpha = 0.7f),
+                    modifier = Modifier.padding(top = 8.dp, bottom = 28.dp)
                 )
-            }
 
-            Button(
-                onClick  = { vm.createGroup(name) },
-                enabled  = name.isNotBlank() && state !is CreateGroupState.Loading,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(52.dp),
-                colors   = ButtonDefaults.buttonColors(containerColor = Purple),
-                shape    = RoundedCornerShape(12.dp)
-            ) {
-                if (state is CreateGroupState.Loading) {
-                    CircularProgressIndicator(
-                        modifier    = Modifier.size(20.dp),
-                        color       = Color.White,
-                        strokeWidth = 2.dp
+                OutlinedTextField(
+                    value         = name,
+                    onValueChange = { name = it },
+                    label         = { Text("Group name") },
+                    placeholder   = { Text("e.g. Squad Goals") },
+                    modifier      = Modifier.fillMaxWidth(),
+                    singleLine    = true,
+                    colors        = OutlinedTextFieldDefaults.colors(
+                        focusedBorderColor   = CyberBlue,
+                        unfocusedBorderColor = CyberBlue.copy(alpha = 0.3f),
+                        focusedLabelColor    = CyberBlue,
+                        unfocusedLabelColor  = CyberBlue.copy(alpha = 0.6f),
+                        focusedTextColor     = CyberText,
+                        unfocusedTextColor   = CyberText,
+                        cursorColor          = CyberBlue
+                    ),
+                    shape = RoundedCornerShape(12.dp)
+                )
+
+                Spacer(Modifier.height(16.dp))
+
+                // Info box
+                CyberCard(modifier = Modifier.fillMaxWidth()) {
+                    Text(
+                        "After creating the group, share the Group ID with friends so they can join from the Groups screen.",
+                        fontSize = 13.sp,
+                        color    = CyberText.copy(alpha = 0.8f)
                     )
-                } else {
-                    Text("Create group", fontWeight = FontWeight.Medium)
                 }
+
+                Spacer(Modifier.weight(1f))
+
+                if (state is CreateGroupState.Error) {
+                    Text(
+                        (state as CreateGroupState.Error).message,
+                        color    = MaterialTheme.colorScheme.error,
+                        fontSize = 13.sp,
+                        modifier = Modifier.padding(bottom = 12.dp)
+                    )
+                }
+
+                if (state is CreateGroupState.Loading) {
+                    CircularProgressIndicator(color = CyberBlue)
+                } else {
+                    GradientButton(
+                        text = "Create group",
+                        onClick = { vm.createGroup(name) },
+                        modifier = Modifier.fillMaxWidth(),
+                        gradient = CyberGradient
+                    )
+                }
+
+                Spacer(Modifier.height(40.dp))
             }
-
-            Spacer(Modifier.height(24.dp))
-        }
-    }
-}
-
-@Preview(showBackground = true)
-@Composable
-fun CreateGroupScreenPreview() {
-    DarePackTheme {
-        Box(Modifier.background(LightBg).fillMaxSize()) {
-            CreateGroupScreen(onBack = {}, onGroupCreated = {})
         }
     }
 }

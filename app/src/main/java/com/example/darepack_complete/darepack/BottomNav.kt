@@ -26,47 +26,51 @@ fun DarePackBottomNav(
     onBucket: () -> Unit,
     onProfile: () -> Unit
 ) {
-    Column {
-        Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(1.dp)
-                .background(Brush.linearGradient(listOf(Color.Transparent, LightSurface, Color.Transparent)))
-        )
-        
-        NavigationBar(
-            containerColor = LightCard,
-            tonalElevation = 0.dp,
-            modifier = Modifier.height(72.dp)
-        ) {
-            NavigationBarItem(
-                selected = current == NavTab.HOME,
-                onClick  = onHome,
-                icon     = { NavIcon(Icons.Default.Home, current == NavTab.HOME) },
-                label    = { NavLabel("Home", current == NavTab.HOME) },
-                colors   = navItemColors()
+    Surface(
+        color = CyberDark,
+        modifier = Modifier.fillMaxWidth()
+    ) {
+        Column(modifier = Modifier.navigationBarsPadding()) {
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(1.dp)
+                    .background(Brush.linearGradient(listOf(Color.Transparent, CyberBlue.copy(alpha = 0.3f), Color.Transparent)))
             )
-            NavigationBarItem(
-                selected = current == NavTab.GROUPS,
-                onClick  = onGroups,
-                icon     = { NavIcon(Icons.Default.Person, current == NavTab.GROUPS) },
-                label    = { NavLabel("Groups", current == NavTab.GROUPS) },
-                colors   = navItemColors()
-            )
-            NavigationBarItem(
-                selected = current == NavTab.BUCKET,
-                onClick  = onBucket,
-                icon     = { NavIcon(Icons.Default.Favorite, current == NavTab.BUCKET) },
-                label    = { NavLabel("Bucket", current == NavTab.BUCKET) },
-                colors   = navItemColors()
-            )
-            NavigationBarItem(
-                selected = current == NavTab.PROFILE,
-                onClick  = onProfile,
-                icon     = { NavIcon(Icons.Default.AccountCircle, current == NavTab.PROFILE) },
-                label    = { NavLabel("Profile", current == NavTab.PROFILE) },
-                colors   = navItemColors()
-            )
+            
+            NavigationBar(
+                containerColor = Color.Transparent,
+                tonalElevation = 0.dp
+            ) {
+                NavigationBarItem(
+                    selected = current == NavTab.HOME,
+                    onClick  = onHome,
+                    icon     = { NavIcon(Icons.Default.Home, current == NavTab.HOME) },
+                    label    = { NavLabel("Home", current == NavTab.HOME) },
+                    colors   = navItemColors()
+                )
+                NavigationBarItem(
+                    selected = current == NavTab.GROUPS,
+                    onClick  = onGroups,
+                    icon     = { NavIcon(Icons.Default.Person, current == NavTab.GROUPS) },
+                    label    = { NavLabel("Groups", current == NavTab.GROUPS) },
+                    colors   = navItemColors()
+                )
+                NavigationBarItem(
+                    selected = current == NavTab.BUCKET,
+                    onClick  = onBucket,
+                    icon     = { NavIcon(Icons.Default.Favorite, current == NavTab.BUCKET) },
+                    label    = { NavLabel("Bucket", current == NavTab.BUCKET) },
+                    colors   = navItemColors()
+                )
+                NavigationBarItem(
+                    selected = current == NavTab.PROFILE,
+                    onClick  = onProfile,
+                    icon     = { NavIcon(Icons.Default.AccountCircle, current == NavTab.PROFILE) },
+                    label    = { NavLabel("Profile", current == NavTab.PROFILE) },
+                    colors   = navItemColors()
+                )
+            }
         }
     }
 }
@@ -76,13 +80,13 @@ private fun NavIcon(icon: androidx.compose.ui.graphics.vector.ImageVector, isSel
     Box(
         modifier = Modifier
             .clip(RoundedCornerShape(12.dp))
-            .background(if (isSelected) Purple.copy(alpha = 0.1f) else Color.Transparent)
+            .background(if (isSelected) CyberBlue.copy(alpha = 0.1f) else Color.Transparent)
             .padding(horizontal = 12.dp, vertical = 4.dp)
     ) {
         Icon(
             icon,
             contentDescription = null,
-            tint = if (isSelected) Purple else TextSecondary,
+            tint = if (isSelected) CyberBlue else CyberBlue.copy(alpha = 0.5f),
             modifier = Modifier.size(24.dp)
         )
     }
@@ -94,15 +98,15 @@ private fun NavLabel(text: String, isSelected: Boolean) {
         text,
         fontSize = 11.sp,
         fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Medium,
-        color = if (isSelected) Purple else TextSecondary
+        color = if (isSelected) CyberBlue else CyberBlue.copy(alpha = 0.5f)
     )
 }
 
 @Composable
 private fun navItemColors() = NavigationBarItemDefaults.colors(
-    selectedIconColor   = Purple,
-    selectedTextColor   = Purple,
-    unselectedIconColor = TextSecondary,
-    unselectedTextColor = TextSecondary,
+    selectedIconColor   = CyberBlue,
+    selectedTextColor   = CyberBlue,
+    unselectedIconColor = CyberBlue.copy(alpha = 0.5f),
+    unselectedTextColor = CyberBlue.copy(alpha = 0.5f),
     indicatorColor      = Color.Transparent
 )

@@ -16,7 +16,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -24,7 +23,7 @@ import com.example.darepack_complete.models.Group
 import com.example.darepack_complete.models.UserModel as User
 import com.example.darepack_complete.ui.theme.*
 import com.example.darepack_complete.viewmodel.GroupsViewModel
-import com.example.darepack_complete.ui.components.LuminousBadge
+import com.example.darepack_complete.ui.components.*
 
 @Composable
 fun GroupsScreen(
@@ -36,23 +35,26 @@ fun GroupsScreen(
     vm: GroupsViewModel = viewModel()
 ) {
     val groups  by vm.groups.collectAsState()
+    val allGroups by vm.allGroups.collectAsState()
     val members by vm.members.collectAsState()
     var selectedGroup by remember { mutableStateOf<Group?>(null) }
     var joinDialog    by remember { mutableStateOf(false) }
+
+    val publicGroups = allGroups.filter { group -> !groups.any { it.groupId == group.groupId } }
 
     LaunchedEffect(selectedGroup) {
         selectedGroup?.let { vm.loadMembers(it.members) }
     }
 
     Scaffold(
-        containerColor = LightBg,
+        containerColor = CyberDark,
         floatingActionButton = {
             LargeFloatingActionButton(
                 onClick        = onCreateGroup,
                 containerColor = Color.Transparent,
                 contentColor   = Color.White,
                 shape          = RoundedCornerShape(20.dp),
-                modifier       = Modifier.background(Brush.linearGradient(PurpleGradient), RoundedCornerShape(20.dp))
+                modifier       = Modifier.background(Brush.linearGradient(CyberGradient), RoundedCornerShape(20.dp))
             ) {
                 Icon(Icons.Default.Add, contentDescription = "Create group", modifier = Modifier.size(32.dp))
             }
@@ -67,80 +69,97 @@ fun GroupsScreen(
             )
         }
     ) { padding ->
-        LazyColumn(
-            modifier            = Modifier.fillMaxSize().padding(padding),
-            contentPadding      = PaddingValues(16.dp),
-            verticalArrangement = Arrangement.spacedBy(12.dp)
-        ) {
-            item {
-                Column(modifier = Modifier.padding(bottom = 12.dp, top = 8.dp)) {
-                    Row(
-                        Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.SpaceBetween,
-                        verticalAlignment     = Alignment.CenterVertically
-                    ) {
-                        Text("Groups", fontSize = 32.sp, fontWeight = FontWeight.ExtraBold, color = PurpleDark)
-                        TextButton(
-                            onClick = { joinDialog = true },
-                            colors = ButtonDefaults.textButtonColors(contentColor = Purple)
+        Box(modifier = Modifier.fillMaxSize().padding(padding)) {
+            CyberBackground()
+            
+            LazyColumn(
+                modifier            = Modifier.fillMaxSize(),
+                contentPadding      = PaddingValues(16.dp),
+                verticalArrangement = Arrangement.spacedBy(12.dp)
+            ) {
+                item {
+                    Column(modifier = Modifier.padding(bottom = 12.dp, top = 8.dp)) {
+                        Row(
+                            Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.SpaceBetween,
+                            verticalAlignment     = Alignment.CenterVertically
                         ) {
-                            Text("JOIN GROUP", fontWeight = FontWeight.Bold, letterSpacing = 1.sp, fontSize = 12.sp)
+                            Text("Groups", fontSize = 32.sp, fontWeight = FontWeight.ExtraBold, color = CyberText)
+                            TextButton(
+                                onClick = { joinDialog = true },
+                                colors = ButtonDefaults.textButtonColors(contentColor = CyberBlue)
+                            ) {
+                                Text("JOIN CODE", fontWeight = FontWeight.Bold, letterSpacing = 1.sp, fontSize = 12.sp)
+                            }
                         }
-                    }
-                    Text("Connect with your pack", fontSize = 14.sp, color = TextSecondary)
-                }
-            }
-
-            if (groups.isEmpty()) {
-                item {
-                    Box(
-                        Modifier.fillMaxWidth()
-                            .background(LightCard, RoundedCornerShape(16.dp))
-                            .padding(32.dp),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                            Icon(Icons.Default.Person, null, tint = LightSurface, modifier = Modifier.size(48.dp))
-                            Spacer(Modifier.height(8.dp))
-                            Text("No groups yet. Create one!", color = TextSecondary, fontSize = 14.sp)
-                        }
+                        Text("Connect with your pack", fontSize = 14.sp, color = CyberBlue.copy(alpha = 0.7f))
                     }
                 }
-            } else {
-                items(groups) { group ->
-                    GroupCard(
-                        group      = group,
-                        isSelected = selectedGroup?.groupId == group.groupId,
-                        onClick    = {
-                            selectedGroup =
-                                if (selectedGroup?.groupId == group.groupId) null else group
-                        }
-                    )
-                }
-            }
 
-            selectedGroup?.let { group ->
-                item {
-                    Spacer(Modifier.height(12.dp))
-                    Row(
-                        Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.SpaceBetween,
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Text(
-                            "Leaderboard — ${group.name}",
-                            fontSize = 18.sp,
-                            fontWeight = FontWeight.Bold,
-                            color = TextPrimary
+                if (groups.isNotEmpty()) {
+                    item {
+                        Text("My Groups", color = CyberText, fontSize = 18.sp, fontWeight = FontWeight.Bold)
+                    }
+                    items(groups) { group ->
+                        GroupCard(
+                            group      = group,
+                            isSelected = selectedGroup?.groupId == group.groupId,
+                            onClick    = {
+                                selectedGroup =
+                                    if (selectedGroup?.groupId == group.groupId) null else group
+                            }
                         )
-                        IconButton(onClick = { onInviteFriends(group.groupId) }) {
-                            Icon(Icons.Default.Person, null, tint = Purple)
+                    }
+                }
+
+                if (publicGroups.isNotEmpty()) {
+                    item {
+                        Spacer(Modifier.height(8.dp))
+                        Text("Discover Packs", color = CyberText, fontSize = 18.sp, fontWeight = FontWeight.Bold)
+                    }
+                    items(publicGroups) { group ->
+                        PublicGroupCard(group = group, onJoin = { vm.joinGroup(group.groupId) })
+                    }
+                }
+
+                if (groups.isEmpty() && publicGroups.isEmpty()) {
+                    item {
+                        CyberCard(Modifier.fillMaxWidth().padding(vertical = 16.dp)) {
+                            Column(
+                                horizontalAlignment = Alignment.CenterHorizontally,
+                                modifier = Modifier.fillMaxWidth().padding(vertical = 12.dp)
+                            ) {
+                                Icon(Icons.Default.Person, null, tint = CyberBlue.copy(alpha = 0.3f), modifier = Modifier.size(48.dp))
+                                Spacer(Modifier.height(8.dp))
+                                Text("No groups found. Create one!", color = CyberText.copy(alpha = 0.5f), fontSize = 14.sp)
+                            }
                         }
                     }
                 }
-                val sortedMembers = members.sortedByDescending { it.totalCompleted }
-                items(sortedMembers) { user ->
-                    LeaderboardRow(user = user, rank = sortedMembers.indexOf(user) + 1)
+
+                selectedGroup?.let { group ->
+                    item {
+                        Spacer(Modifier.height(12.dp))
+                        Row(
+                            Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.SpaceBetween,
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Text(
+                                "Leaderboard — ${group.name}",
+                                fontSize = 18.sp,
+                                fontWeight = FontWeight.Bold,
+                                color = CyberText
+                            )
+                            IconButton(onClick = { onInviteFriends(group.groupId) }) {
+                                Icon(Icons.Default.Person, null, tint = CyberBlue)
+                            }
+                        }
+                    }
+                    val sortedMembers = members.sortedByDescending { it.totalCompleted }
+                    items(sortedMembers) { user ->
+                        LeaderboardRow(user = user, rank = sortedMembers.indexOf(user) + 1)
+                    }
                 }
             }
         }
@@ -155,36 +174,63 @@ fun GroupsScreen(
 }
 
 @Composable
-fun GroupCard(group: Group, isSelected: Boolean, onClick: () -> Unit) {
-    Card(
-        onClick = onClick,
-        colors  = CardDefaults.cardColors(
-            containerColor = if (isSelected) Color.White else LightCard
-        ),
-        shape   = RoundedCornerShape(16.dp),
-        elevation = CardDefaults.cardElevation(defaultElevation = if (isSelected) 4.dp else 0.dp),
-        border = if (isSelected) BorderStroke(2.dp, Brush.linearGradient(PurpleGradient)) else null
-    ) {
+fun PublicGroupCard(group: Group, onJoin: () -> Unit) {
+    CyberCard(modifier = Modifier.fillMaxWidth()) {
         Row(
-            Modifier.fillMaxWidth().padding(16.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
             Box(
-                Modifier.size(48.dp).background(Brush.linearGradient(listOf(Purple.copy(alpha = 0.1f), Purple.copy(alpha = 0.2f))), CircleShape),
+                Modifier.size(40.dp).background(CyberBlue.copy(alpha = 0.1f), CircleShape),
                 contentAlignment = Alignment.Center
             ) {
                 Text(
                     if (group.name.isNotEmpty()) group.name.first().uppercaseChar().toString() else "?",
-                    color = Purple, fontWeight = FontWeight.ExtraBold, fontSize = 20.sp
+                    color = CyberBlue, fontWeight = FontWeight.Bold
+                )
+            }
+            Spacer(Modifier.width(12.dp))
+            Column(Modifier.weight(1f)) {
+                Text(group.name, color = CyberText, fontWeight = FontWeight.Bold, fontSize = 15.sp)
+                Text("${group.members.size} members", color = CyberText.copy(alpha = 0.6f), fontSize = 12.sp)
+            }
+            Button(
+                onClick = onJoin,
+                colors = ButtonDefaults.buttonColors(containerColor = CyberBlue.copy(alpha = 0.1f), contentColor = CyberBlue),
+                shape = RoundedCornerShape(8.dp),
+                contentPadding = PaddingValues(horizontal = 16.dp, vertical = 4.dp),
+                modifier = Modifier.height(32.dp)
+            ) {
+                Text("JOIN", fontSize = 12.sp, fontWeight = FontWeight.ExtraBold)
+            }
+        }
+    }
+}
+
+@Composable
+fun GroupCard(group: Group, isSelected: Boolean, onClick: () -> Unit) {
+    CyberCard(
+        onClick = onClick,
+        modifier = Modifier.fillMaxWidth()
+    ) {
+        Row(
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Box(
+                Modifier.size(48.dp).background(Brush.linearGradient(listOf(CyberBlue.copy(alpha = 0.1f), CyberBlue.copy(alpha = 0.2f))), CircleShape),
+                contentAlignment = Alignment.Center
+            ) {
+                Text(
+                    if (group.name.isNotEmpty()) group.name.first().uppercaseChar().toString() else "?",
+                    color = CyberBlue, fontWeight = FontWeight.ExtraBold, fontSize = 20.sp
                 )
             }
             Spacer(Modifier.width(16.dp))
             Column(Modifier.weight(1f)) {
-                Text(group.name, color = TextPrimary, fontWeight = FontWeight.Bold, fontSize = 16.sp)
-                Text("${group.members.size} members", color = TextSecondary, fontSize = 13.sp)
+                Text(group.name, color = CyberText, fontWeight = FontWeight.Bold, fontSize = 16.sp)
+                Text("${group.members.size} members", color = CyberText.copy(alpha = 0.6f), fontSize = 13.sp)
             }
             if (isSelected) {
-                Icon(Icons.Default.Check, null, tint = Purple)
+                Icon(Icons.Default.Check, null, tint = CyberBlue)
             }
         }
     }
@@ -194,26 +240,25 @@ fun GroupCard(group: Group, isSelected: Boolean, onClick: () -> Unit) {
 fun LeaderboardRow(user: User, rank: Int) {
     val rankColor = when (rank) {
         1    -> Yellow
-        2    -> Color(0xFF94A3B8) // Bright Silver
-        3    -> Color(0xFFD97706) // Vibrant Bronze
-        else -> LightSurface
+        2    -> Color(0xFF94A3B8) // Silver
+        3    -> Color(0xFFD97706) // Bronze
+        else -> CyberBlue.copy(alpha = 0.1f)
     }
-    Row(
-        Modifier.fillMaxWidth()
-            .padding(vertical = 4.dp)
-            .background(LightCard, RoundedCornerShape(12.dp))
-            .padding(12.dp),
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        Box(
-            Modifier.size(28.dp).background(rankColor, CircleShape),
-            contentAlignment = Alignment.Center
+    
+    CyberCard(Modifier.fillMaxWidth().padding(vertical = 2.dp)) {
+        Row(
+            verticalAlignment = Alignment.CenterVertically
         ) {
-            Text("$rank", color = if (rank <= 3) Color.White else TextSecondary, fontWeight = FontWeight.Bold, fontSize = 12.sp)
+            Box(
+                Modifier.size(28.dp).background(rankColor, CircleShape),
+                contentAlignment = Alignment.Center
+            ) {
+                Text("$rank", color = if (rank <= 3) Color.White else CyberText.copy(alpha = 0.6f), fontWeight = FontWeight.Bold, fontSize = 12.sp)
+            }
+            Spacer(Modifier.width(12.dp))
+            Text(user.name, color = CyberText, fontSize = 15.sp, fontWeight = FontWeight.Medium, modifier = Modifier.weight(1f))
+            LuminousBadge(text = "${user.totalCompleted} DARES", color = CyberBlue)
         }
-        Spacer(Modifier.width(12.dp))
-        Text(user.name, color = TextPrimary, fontSize = 15.sp, fontWeight = FontWeight.Medium, modifier = Modifier.weight(1f))
-        LuminousBadge(text = "${user.totalCompleted} DARES", color = Purple)
     }
 }
 
@@ -222,36 +267,41 @@ fun JoinGroupDialog(onDismiss: () -> Unit, onJoin: (String) -> Unit) {
     var groupId by remember { mutableStateOf("") }
     AlertDialog(
         onDismissRequest = onDismiss,
-        containerColor   = LightCard,
-        title = { Text("Join a group", color = TextPrimary, fontWeight = FontWeight.Bold) },
+        containerColor   = CyberSurface,
+        title = { Text("Join a group", color = CyberText, fontWeight = FontWeight.Bold) },
         text  = {
-            OutlinedTextField(
-                value         = groupId,
-                onValueChange = { groupId = it },
-                label         = { Text("Group ID") },
-                modifier      = Modifier.fillMaxWidth(),
-                shape         = RoundedCornerShape(16.dp),
-                colors        = OutlinedTextFieldDefaults.colors(
-                    focusedBorderColor   = Purple,
-                    unfocusedBorderColor = LightSurface,
-                    focusedLabelColor    = Purple,
-                    unfocusedLabelColor  = TextSecondary,
-                    focusedTextColor     = TextPrimary,
-                    unfocusedTextColor   = TextPrimary
+            Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                Text("Enter the 6-digit invite code or Group ID to join your friends.", color = CyberBlue.copy(alpha = 0.7f), fontSize = 13.sp)
+                OutlinedTextField(
+                    value         = groupId,
+                    onValueChange = { groupId = it },
+                    label         = { Text("Invite Code") },
+                    placeholder   = { Text("e.g. 123456") },
+                    modifier      = Modifier.fillMaxWidth(),
+                    shape         = RoundedCornerShape(12.dp),
+                    colors        = OutlinedTextFieldDefaults.colors(
+                        focusedBorderColor   = CyberBlue,
+                        unfocusedBorderColor = CyberBlue.copy(alpha = 0.3f),
+                        focusedLabelColor    = CyberBlue,
+                        unfocusedLabelColor  = CyberBlue.copy(alpha = 0.6f),
+                        focusedTextColor     = CyberText,
+                        unfocusedTextColor   = CyberText,
+                        cursorColor          = CyberBlue
+                    )
                 )
-            )
+            }
         },
         confirmButton = {
             Button(
                 onClick = { if (groupId.isNotBlank()) onJoin(groupId) },
-                colors = ButtonDefaults.buttonColors(containerColor = Purple),
+                colors = ButtonDefaults.buttonColors(containerColor = CyberBlue),
                 shape = RoundedCornerShape(12.dp)
             ) {
                 Text("Join")
             }
         },
         dismissButton = {
-            TextButton(onClick = onDismiss) { Text("Cancel", color = Color.Gray) }
+            TextButton(onClick = onDismiss) { Text("Cancel", color = CyberText.copy(alpha = 0.5f)) }
         }
     )
 }

@@ -9,16 +9,16 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -26,6 +26,7 @@ import coil.compose.AsyncImage
 import com.example.darepack_complete.ui.theme.*
 import com.example.darepack_complete.viewmodel.DareDetailState
 import com.example.darepack_complete.viewmodel.DareDetailViewModel
+import com.example.darepack_complete.ui.components.*
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -54,208 +55,189 @@ fun DareDetailScreen(
         .getInstance().currentUser?.uid
 
     Scaffold(
-        containerColor = LightBg,
+        containerColor = CyberDark,
         topBar = {
             TopAppBar(
-                title = { Text("Dare detail", color = TextPrimary, fontWeight = FontWeight.Medium) },
+                title = { Text("Dare detail", color = CyberText, fontWeight = FontWeight.Bold) },
                 navigationIcon = {
                     IconButton(onClick = onBack) {
-                        Icon(Icons.Default.ArrowBack, contentDescription = "Back", tint = TextPrimary)
+                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back", tint = CyberText)
                     }
                 },
-                colors = TopAppBarDefaults.topAppBarColors(containerColor = LightBg)
+                colors = TopAppBarDefaults.topAppBarColors(containerColor = CyberDark)
             )
         }
     ) { padding ->
-        when (state) {
-            is DareDetailState.Loading -> {
-                Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                    CircularProgressIndicator(color = Purple)
-                }
-            }
-
-            is DareDetailState.Error -> {
-                Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                    Text((state as DareDetailState.Error).message, color = TextSecondary)
-                }
-            }
-
-            else -> {
-                Column(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .padding(padding)
-                        .verticalScroll(rememberScrollState())
-                        .padding(16.dp),
-                    verticalArrangement = Arrangement.spacedBy(16.dp)
-                ) {
-                    // Status badge
-                    val statusColor = when (dare?.status) {
-                        "completed" -> Teal
-                        "expired"   -> Pink
-                        else        -> Purple
+        Box(modifier = Modifier.fillMaxSize().padding(padding)) {
+            CyberBackground()
+            
+            when (state) {
+                is DareDetailState.Loading -> {
+                    Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                        CircularProgressIndicator(color = CyberBlue)
                     }
-                    Box(
-                        Modifier
-                            .background(statusColor.copy(alpha = 0.15f), RoundedCornerShape(8.dp))
-                            .padding(horizontal = 12.dp, vertical = 6.dp)
-                    ) {
-                        Text(dare?.status ?: "", color = statusColor, fontSize = 12.sp)
+                }
+
+                is DareDetailState.Error -> {
+                    Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                        Text((state as DareDetailState.Error).message, color = CyberBlue.copy(alpha = 0.5f))
                     }
+                }
 
-                    // Title
-                    Text(
-                        dare?.title ?: "",
-                        fontSize   = 24.sp,
-                        fontWeight = FontWeight.Bold,
-                        color      = TextPrimary
-                    )
-
-                    // Meta info
-                    Card(
-                        colors = CardDefaults.cardColors(containerColor = LightCard),
-                        shape  = RoundedCornerShape(12.dp),
-                        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
+                else -> {
+                    Column(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .verticalScroll(rememberScrollState())
+                            .padding(16.dp),
+                        verticalArrangement = Arrangement.spacedBy(16.dp)
                     ) {
-                        Column(
-                            Modifier.padding(16.dp),
-                            verticalArrangement = Arrangement.spacedBy(8.dp)
-                        ) {
-                            MetaRow(label = "From",     value = dare?.daredByName ?: "")
-                            MetaRow(label = "To",       value = dare?.daredToName ?: "")
-                            if (dare?.status == "pending") {
-                                MetaRow(
-                                    label = "Deadline",
-                                    value = dare?.deadline?.toDate()?.let { sdf.format(it) } ?: ""
-                                )
-                            }
+                        // Status badge
+                        val statusColor = when (dare?.status) {
+                            "completed" -> CyberBlue
+                            "expired"   -> Pink
+                            else        -> CyberBlue
                         }
-                    }
+                        LuminousBadge(text = dare?.status ?: "", color = statusColor)
 
-                    // Proof section (if completed)
-                    proof?.let { p ->
-                        Text("Proof", fontSize = 16.sp, fontWeight = FontWeight.Medium, color = TextPrimary)
-                        AsyncImage(
-                            model              = p.photoUrl,
-                            contentDescription = "Proof photo",
-                            contentScale       = ContentScale.Crop,
-                            modifier           = Modifier
-                                .fillMaxWidth()
-                                .height(220.dp)
-                                .clip(RoundedCornerShape(12.dp))
+                        // Title
+                        Text(
+                            dare?.title ?: "",
+                            fontSize   = 24.sp,
+                            fontWeight = FontWeight.Bold,
+                            color      = CyberText
                         )
-                        if (p.caption.isNotBlank()) {
-                            Text(p.caption, color = TextSecondary, fontSize = 14.sp)
-                        }
-                        // Reactions
-                        if (p.reactions.isNotEmpty()) {
-                            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                                p.reactions.values.groupBy { it }
-                                    .forEach { (emoji, list) ->
-                                        Box(
-                                            Modifier
-                                                .background(LightSurface, RoundedCornerShape(20.dp))
-                                                .padding(horizontal = 10.dp, vertical = 4.dp)
-                                        ) {
-                                            Text("$emoji ${list.size}", fontSize = 13.sp, color = TextPrimary)
-                                        }
-                                    }
-                            }
-                        }
-                        // Add reaction
-                        Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                            listOf("🔥", "😂", "👏", "😮", "❤️").forEach { emoji ->
-                                TextButton(
-                                    onClick = { vm.addReaction(p.proofId, emoji) },
-                                    contentPadding = PaddingValues(4.dp)
-                                ) {
-                                    Text(emoji, fontSize = 20.sp)
+
+                        // Meta info
+                        CyberCard(modifier = Modifier.fillMaxWidth()) {
+                            Column(
+                                verticalArrangement = Arrangement.spacedBy(8.dp)
+                            ) {
+                                MetaRow(label = "From",     value = dare?.daredByName ?: "")
+                                MetaRow(label = "To",       value = dare?.daredToName ?: "")
+                                if (dare?.status == "pending") {
+                                    MetaRow(
+                                        label = "Deadline",
+                                        value = dare?.deadline?.toDate()?.let { sdf.format(it) } ?: ""
+                                    )
                                 }
                             }
                         }
-                    }
 
-                    // Complete dare section (only for the recipient, only if pending)
-                    if (isMyDare && dare?.status == "pending") {
-                        HorizontalDivider(color = LightSurface)
-                        Text(
-                            "Complete this dare",
-                            fontSize   = 16.sp,
-                            fontWeight = FontWeight.Medium,
-                            color      = TextPrimary
-                        )
-
-                        // Photo picker
-                        if (selectedUri != null) {
+                        // Proof section (if completed)
+                        proof?.let { p ->
+                            Text("Proof", fontSize = 16.sp, fontWeight = FontWeight.Medium, color = CyberText)
                             AsyncImage(
-                                model              = selectedUri,
-                                contentDescription = "Selected photo",
+                                model              = p.photoUrl,
+                                contentDescription = "Proof photo",
                                 contentScale       = ContentScale.Crop,
                                 modifier           = Modifier
                                     .fillMaxWidth()
-                                    .height(180.dp)
+                                    .height(220.dp)
                                     .clip(RoundedCornerShape(12.dp))
                             )
-                        }
-
-                        OutlinedButton(
-                            onClick  = { imagePicker.launch("image/*") },
-                            modifier = Modifier.fillMaxWidth(),
-                            shape    = RoundedCornerShape(12.dp),
-                            colors   = ButtonDefaults.outlinedButtonColors(contentColor = Purple)
-                        ) {
-                            Text(if (selectedUri == null) "Pick proof photo" else "Change photo")
-                        }
-
-                        OutlinedTextField(
-                            value         = caption,
-                            onValueChange = { caption = it },
-                            label         = { Text("Add a caption (optional)") },
-                            modifier      = Modifier.fillMaxWidth(),
-                            colors        = OutlinedTextFieldDefaults.colors(
-                                focusedBorderColor   = Purple,
-                                unfocusedBorderColor = LightSurface,
-                                focusedLabelColor    = Purple,
-                                unfocusedLabelColor  = TextSecondary,
-                                focusedTextColor     = TextPrimary,
-                                unfocusedTextColor   = TextPrimary
-                            )
-                        )
-
-                        if (state is DareDetailState.Error) {
-                            Text(
-                                (state as DareDetailState.Error).message,
-                                color    = MaterialTheme.colorScheme.error,
-                                fontSize = 13.sp
-                            )
-                        }
-
-                        Button(
-                            onClick  = {
-                                selectedUri?.let {
-                                    vm.completeDare(dareId, it, caption)
+                            if (p.caption.isNotBlank()) {
+                                Text(p.caption, color = CyberText.copy(alpha = 0.7f), fontSize = 14.sp)
+                            }
+                            // Reactions
+                            if (p.reactions.isNotEmpty()) {
+                                Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                                    p.reactions.values.groupBy { it }
+                                        .forEach { (emoji, list) ->
+                                            Box(
+                                                Modifier
+                                                    .background(CyberSurface, RoundedCornerShape(20.dp))
+                                                    .padding(horizontal = 10.dp, vertical = 4.dp)
+                                            ) {
+                                                Text("$emoji ${list.size}", fontSize = 13.sp, color = CyberText)
+                                            }
+                                        }
                                 }
-                            },
-                            enabled  = selectedUri != null && state !is DareDetailState.Uploading,
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .height(52.dp),
-                            colors   = ButtonDefaults.buttonColors(containerColor = Teal),
-                            shape    = RoundedCornerShape(12.dp)
-                        ) {
-                            if (state is DareDetailState.Uploading) {
-                                CircularProgressIndicator(
-                                    modifier    = Modifier.size(20.dp),
-                                    color       = Color.White,
-                                    strokeWidth = 2.dp
-                                )
-                            } else {
-                                Text("Mark as completed ✓", fontWeight = FontWeight.Medium)
+                            }
+                            // Add reaction
+                            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                                listOf("🔥", "😂", "👏", "😮", "❤️").forEach { emoji ->
+                                    TextButton(
+                                        onClick = { vm.addReaction(p.proofId, emoji) },
+                                        contentPadding = PaddingValues(4.dp)
+                                    ) {
+                                        Text(emoji, fontSize = 20.sp)
+                                    }
+                                }
                             }
                         }
-                    }
 
-                    Spacer(Modifier.height(16.dp))
+                        // Complete dare section (only for the recipient, only if pending)
+                        if (isMyDare && dare?.status == "pending") {
+                            HorizontalDivider(color = CyberBlue.copy(alpha = 0.1f))
+                            Text(
+                                "Complete this dare",
+                                fontSize   = 16.sp,
+                                fontWeight = FontWeight.Medium,
+                                color      = CyberText
+                            )
+
+                            // Photo picker
+                            if (selectedUri != null) {
+                                AsyncImage(
+                                    model              = selectedUri,
+                                    contentDescription = "Selected photo",
+                                    contentScale       = ContentScale.Crop,
+                                    modifier           = Modifier
+                                        .fillMaxWidth()
+                                        .height(180.dp)
+                                        .clip(RoundedCornerShape(12.dp))
+                                )
+                            }
+
+                            OutlinedButton(
+                                onClick  = { imagePicker.launch("image/*") },
+                                modifier = Modifier.fillMaxWidth(),
+                                shape    = RoundedCornerShape(12.dp),
+                                colors   = ButtonDefaults.outlinedButtonColors(contentColor = CyberBlue),
+                                border   = ButtonDefaults.outlinedButtonBorder(enabled = true).copy(brush = Brush.linearGradient(CyberGradient))
+                            ) {
+                                Text(if (selectedUri == null) "Pick proof photo" else "Change photo")
+                            }
+
+                            OutlinedTextField(
+                                value         = caption,
+                                onValueChange = { caption = it },
+                                label         = { Text("Add a caption (optional)") },
+                                modifier      = Modifier.fillMaxWidth(),
+                                colors        = OutlinedTextFieldDefaults.colors(
+                                    focusedBorderColor   = CyberBlue,
+                                    unfocusedBorderColor = CyberBlue.copy(alpha = 0.3f),
+                                    focusedLabelColor    = CyberBlue,
+                                    unfocusedLabelColor  = CyberBlue.copy(alpha = 0.6f),
+                                    focusedTextColor     = CyberText,
+                                    unfocusedTextColor   = CyberText,
+                                    cursorColor          = CyberBlue
+                                )
+                            )
+
+                            if (state is DareDetailState.Error) {
+                                Text(
+                                    (state as DareDetailState.Error).message,
+                                    color    = MaterialTheme.colorScheme.error,
+                                    fontSize = 13.sp
+                                )
+                            }
+
+                            GradientButton(
+                                text = "Mark as completed ✓",
+                                onClick = {
+                                    selectedUri?.let {
+                                        vm.completeDare(dareId, it, caption)
+                                    }
+                                },
+                                modifier = Modifier.fillMaxWidth(),
+                                gradient = CyberGradient
+                            )
+                        }
+
+                        Spacer(Modifier.height(16.dp))
+                    }
                 }
             }
         }
@@ -265,7 +247,7 @@ fun DareDetailScreen(
 @Composable
 fun MetaRow(label: String, value: String) {
     Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
-        Text(label, color = TextSecondary, fontSize = 13.sp)
-        Text(value, color = TextPrimary, fontSize = 13.sp, fontWeight = FontWeight.Medium)
+        Text(label, color = CyberText.copy(alpha = 0.6f), fontSize = 13.sp)
+        Text(value, color = CyberText, fontSize = 13.sp, fontWeight = FontWeight.Medium)
     }
 }

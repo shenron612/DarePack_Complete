@@ -9,7 +9,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -23,6 +23,7 @@ import com.example.darepack_complete.models.UserModel as User
 import com.example.darepack_complete.ui.theme.*
 import com.example.darepack_complete.viewmodel.SendDareState
 import com.example.darepack_complete.viewmodel.SendDareViewModel
+import com.example.darepack_complete.ui.components.*
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -50,153 +51,146 @@ fun SendDareScreen(
     val sdf = SimpleDateFormat("MMM dd, yyyy", Locale.getDefault())
 
     Scaffold(
-        containerColor = LightBg,
+        containerColor = CyberDark,
         topBar = {
             TopAppBar(
-                title = { Text("Send a dare", color = TextPrimary, fontWeight = FontWeight.Medium) },
+                title = { Text("Send a dare", color = CyberText, fontWeight = FontWeight.Bold) },
                 navigationIcon = {
                     IconButton(onClick = onDareSent) {
-                        Icon(Icons.Default.ArrowBack, contentDescription = "Back", tint = TextPrimary)
+                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back", tint = CyberText)
                     }
                 },
-                colors = TopAppBarDefaults.topAppBarColors(containerColor = LightBg)
+                colors = TopAppBarDefaults.topAppBarColors(containerColor = CyberDark)
             )
         }
     ) { padding ->
-        LazyColumn(
-            modifier            = Modifier
-                .fillMaxSize()
-                .padding(padding)
-                .padding(horizontal = 16.dp),
-            verticalArrangement = Arrangement.spacedBy(16.dp),
-            contentPadding      = PaddingValues(vertical = 16.dp)
-        ) {
-            // Dare title card
-            item {
-                Card(
-                    colors = CardDefaults.cardColors(containerColor = Purple.copy(alpha = 0.1f)),
-                    shape  = RoundedCornerShape(12.dp)
-                ) {
-                    Column(Modifier.padding(16.dp)) {
-                        Text("Dare", fontSize = 11.sp, color = Purple)
-                        Spacer(Modifier.height(4.dp))
-                        Text(
-                            item?.title ?: "Loading...",
-                            fontSize   = 18.sp,
-                            fontWeight = FontWeight.Bold,
-                            color      = TextPrimary
-                        )
-                        Text(
-                            item?.category ?: "",
-                            fontSize = 12.sp,
-                            color    = TextSecondary,
-                            modifier = Modifier.padding(top = 4.dp)
-                        )
-                    }
-                }
-            }
-
-            // Pick a friend
-            item {
-                Text(
-                    "Who do you dare?",
-                    fontSize   = 16.sp,
-                    fontWeight = FontWeight.Medium,
-                    color      = TextPrimary
-                )
-            }
-
-            if (members.isEmpty()) {
+        Box(modifier = Modifier.fillMaxSize().padding(padding)) {
+            CyberBackground()
+            
+            LazyColumn(
+                modifier            = Modifier
+                    .fillMaxSize()
+                    .padding(horizontal = 16.dp),
+                verticalArrangement = Arrangement.spacedBy(16.dp),
+                contentPadding      = PaddingValues(vertical = 16.dp)
+            ) {
+                // Dare title card
                 item {
-                    Text("No other members in this group yet.", color = TextSecondary, fontSize = 13.sp)
-                }
-            } else {
-                items(members) { user ->
-                    MemberPickerRow(
-                        user       = user,
-                        isSelected = selectedUser?.userId == user.userId,
-                        onClick    = { selectedUser = user }
-                    )
-                }
-            }
-
-            // Deadline picker
-            item {
-                Text(
-                    "Set a deadline",
-                    fontSize   = 16.sp,
-                    fontWeight = FontWeight.Medium,
-                    color      = TextPrimary
-                )
-                Spacer(Modifier.height(8.dp))
-                Row(
-                    modifier          = Modifier
-                        .fillMaxWidth()
-                        .background(LightCard, RoundedCornerShape(12.dp))
-                        .clickable { showDatePicker = true }
-                        .padding(16.dp),
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment     = Alignment.CenterVertically
-                ) {
-                    Text(sdf.format(Date(deadlineMillis)), color = TextPrimary, fontSize = 15.sp)
-                    Text("Change →", color = Purple, fontSize = 13.sp)
-                }
-            }
-
-            // Quick deadline buttons
-            item {
-                Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                    listOf("3 days" to 3, "1 week" to 7, "2 weeks" to 14).forEach { (label, days) ->
-                        FilterChip(
-                            selected = false,
-                            onClick  = {
-                                deadlineMillis = System.currentTimeMillis() +
-                                        days.toLong() * 24 * 60 * 60 * 1000
-                            },
-                            label  = { Text(label, fontSize = 12.sp) },
-                            colors = FilterChipDefaults.filterChipColors(
-                                containerColor = LightCard,
-                                labelColor     = TextSecondary
+                    CyberCard(modifier = Modifier.fillMaxWidth()) {
+                        Column {
+                            Text("Dare", fontSize = 11.sp, color = CyberBlue)
+                            Spacer(Modifier.height(4.dp))
+                            Text(
+                                item?.title ?: "Loading...",
+                                fontSize   = 18.sp,
+                                fontWeight = FontWeight.Bold,
+                                color      = CyberText
                             )
-                        )
+                            Text(
+                                item?.category ?: "",
+                                fontSize = 12.sp,
+                                color    = CyberBlue.copy(alpha = 0.7f),
+                                modifier = Modifier.padding(top = 4.dp)
+                            )
+                        }
                     }
                 }
-            }
 
-            // Error
-            if (state is SendDareState.Error) {
+                // Pick a friend
                 item {
                     Text(
-                        (state as SendDareState.Error).message,
-                        color    = MaterialTheme.colorScheme.error,
-                        fontSize = 13.sp
+                        "Who do you dare?",
+                        fontSize   = 16.sp,
+                        fontWeight = FontWeight.Medium,
+                        color      = CyberText
                     )
                 }
-            }
 
-            // Send button
-            item {
-                Button(
-                    onClick  = { selectedUser?.let { vm.sendDare(it, deadlineMillis) } },
-                    enabled  = selectedUser != null && state !is SendDareState.Loading,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(52.dp),
-                    colors   = ButtonDefaults.buttonColors(containerColor = Purple),
-                    shape    = RoundedCornerShape(12.dp)
-                ) {
-                    if (state is SendDareState.Loading) {
-                        CircularProgressIndicator(
-                            modifier    = Modifier.size(20.dp),
-                            color       = Color.White,
-                            strokeWidth = 2.dp
-                        )
-                    } else {
-                        Text(
-                            if (selectedUser != null) "Dare ${selectedUser!!.name}!" else "Select a friend first",
-                            fontWeight = FontWeight.Medium
+                if (members.isEmpty()) {
+                    item {
+                        Text("No other members in this group yet.", color = CyberBlue.copy(alpha = 0.5f), fontSize = 13.sp)
+                    }
+                } else {
+                    items(members) { user ->
+                        MemberPickerRow(
+                            user       = user,
+                            isSelected = selectedUser?.userId == user.userId,
+                            onClick    = { selectedUser = user }
                         )
                     }
+                }
+
+                // Deadline picker
+                item {
+                    Text(
+                        "Set a deadline",
+                        fontSize   = 16.sp,
+                        fontWeight = FontWeight.Medium,
+                        color      = CyberText
+                    )
+                    Spacer(Modifier.height(8.dp))
+                    CyberCard(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .clickable { showDatePicker = true }
+                    ) {
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.SpaceBetween,
+                            verticalAlignment     = Alignment.CenterVertically
+                        ) {
+                            Text(sdf.format(Date(deadlineMillis)), color = CyberText, fontSize = 15.sp)
+                            Text("Change →", color = CyberBlue, fontSize = 13.sp)
+                        }
+                    }
+                }
+
+                // Quick deadline buttons
+                item {
+                    Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                        listOf("3 days" to 3, "1 week" to 7, "2 weeks" to 14).forEach { (label, days) ->
+                            FilterChip(
+                                selected = false,
+                                onClick  = {
+                                    deadlineMillis = System.currentTimeMillis() +
+                                            days.toLong() * 24 * 60 * 60 * 1000
+                                },
+                                label  = { Text(label, fontSize = 12.sp) },
+                                colors = FilterChipDefaults.filterChipColors(
+                                    containerColor = CyberSurface,
+                                    labelColor     = CyberText.copy(alpha = 0.7f),
+                                    selectedContainerColor = CyberBlue,
+                                    selectedLabelColor = Color.White
+                                ),
+                                border = FilterChipDefaults.filterChipBorder(
+                                    borderColor = CyberBlue.copy(alpha = 0.3f),
+                                    enabled = true,
+                                    selected = false
+                                )
+                            )
+                        }
+                    }
+                }
+
+                // Error
+                if (state is SendDareState.Error) {
+                    item {
+                        Text(
+                            (state as SendDareState.Error).message,
+                            color    = MaterialTheme.colorScheme.error,
+                            fontSize = 13.sp
+                        )
+                    }
+                }
+
+                // Send button
+                item {
+                    GradientButton(
+                        text = if (selectedUser != null) "Dare ${selectedUser!!.name}!" else "Select a friend first",
+                        onClick = { selectedUser?.let { vm.sendDare(it, deadlineMillis) } },
+                        modifier = Modifier.fillMaxWidth(),
+                        gradient = CyberGradient
+                    )
                 }
             }
         }
@@ -205,48 +199,38 @@ fun SendDareScreen(
 
 @Composable
 fun MemberPickerRow(user: User, isSelected: Boolean, onClick: () -> Unit) {
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .background(
-                if (isSelected) Purple.copy(alpha = 0.1f) else LightCard,
-                RoundedCornerShape(12.dp)
-            )
-            .border(
-                width  = if (isSelected) 1.dp else 0.dp,
-                color  = if (isSelected) Purple else Color.Transparent,
-                shape  = RoundedCornerShape(12.dp)
-            )
-            .clickable(onClick = onClick)
-            .padding(12.dp),
-        verticalAlignment = Alignment.CenterVertically
+    CyberCard(
+        modifier = Modifier.fillMaxWidth(),
+        onClick = onClick
     ) {
-        Box(
-            modifier         = Modifier
-                .size(40.dp)
-                .background(Purple.copy(alpha = 0.15f), CircleShape),
-            contentAlignment = Alignment.Center
-        ) {
-            Text(
-                user.name.firstOrNull()?.uppercaseChar()?.toString() ?: "?",
-                color      = Purple,
-                fontWeight = FontWeight.Bold,
-                fontSize   = 16.sp
-            )
-        }
-        Spacer(Modifier.width(12.dp))
-        Column(Modifier.weight(1f)) {
-            Text(user.name, color = TextPrimary, fontWeight = FontWeight.Medium, fontSize = 14.sp)
-            Text("${user.totalCompleted} dares completed", color = TextSecondary, fontSize = 12.sp)
-        }
-        if (isSelected) {
+        Row(verticalAlignment = Alignment.CenterVertically) {
             Box(
                 modifier         = Modifier
-                    .size(22.dp)
-                    .background(Purple, CircleShape),
+                    .size(40.dp)
+                    .background(CyberBlue.copy(alpha = 0.15f), CircleShape),
                 contentAlignment = Alignment.Center
             ) {
-                Text("✓", color = Color.White, fontSize = 12.sp)
+                Text(
+                    user.name.firstOrNull()?.uppercaseChar()?.toString() ?: "?",
+                    color      = CyberBlue,
+                    fontWeight = FontWeight.Bold,
+                    fontSize   = 16.sp
+                )
+            }
+            Spacer(Modifier.width(12.dp))
+            Column(Modifier.weight(1f)) {
+                Text(user.name, color = CyberText, fontWeight = FontWeight.Medium, fontSize = 14.sp)
+                Text("${user.totalCompleted} dares completed", color = CyberText.copy(alpha = 0.6f), fontSize = 12.sp)
+            }
+            if (isSelected) {
+                Box(
+                    modifier         = Modifier
+                        .size(22.dp)
+                        .background(CyberBlue, CircleShape),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Text("✓", color = Color.White, fontSize = 12.sp)
+                }
             }
         }
     }

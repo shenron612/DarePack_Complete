@@ -29,22 +29,41 @@ class InviteFriendsViewModel : ViewModel() {
     }
 
     fun searchUsers(query: String) {
-        if (query.isBlank()) {
+        if (query.isBlank() || query.length < 2) {
             _searchResults.value = emptyList()
             return
         }
+        val lowerQuery = query.lowercase().trim()
+        val currentUserId = com.google.firebase.auth.FirebaseAuth.getInstance().currentUser?.uid
+        
         viewModelScope.launch {
             try {
-                // This is a very basic search (matches email prefix)
+                // Search by email
                 val snapshot = db.getReference("Users")
                     .orderByChild("email")
+                    .startAt(lowerQuery)
+                    .endAt(lowerQuery + "\uf8ff")
+                    .get().await()
+                
+                val emailUsers = snapshot.children.mapNotNull { it.getValue(UserModel::class.java) }
+                
+                // Search by name
+                val nameSnapshot = db.getReference("Users")
+                    .orderByChild("name")
                     .startAt(query)
                     .endAt(query + "\uf8ff")
                     .get().await()
+                val nameUsers = nameSnapshot.children.mapNotNull { it.getValue(UserModel::class.java) }
+
+                // Combine and filter out current user
+                val combined = (emailUsers + nameUsers)
+                    .distinctBy { it.userId }
+                    .filter { it.userId != currentUserId }
                 
-                val users = snapshot.children.mapNotNull { it.getValue(UserModel::class.java) }
-                _searchResults.value = users
-            } catch (e: Exception) {}
+                _searchResults.value = combined
+            } catch (e: Exception) {
+                e.printStackTrace()
+            }
         }
     }
     
@@ -52,18 +71,22 @@ class InviteFriendsViewModel : ViewModel() {
         val groupId = _group.value?.groupId ?: return
         viewModelScope.launch {
             try {
-                // In a real app, we'd send a notification. 
-                // Here we just add them to the group directly for simplicity
                 val groupRef = db.getReference("Groups/$groupId")
-                val group = _group.value ?: return@launch
-                if (!group.members.contains(userId)) {
-                    val newMembers = group.members + userId
+                // Get latest group data to ensure we have the current members list
+                val snapshot = groupRef.get().await()
+                val currentGroup = snapshot.getValue(Group::class.java) ?: return@launch
+                
+                if (!currentGroup.members.contains(userId)) {
+                    val newMembers = currentGroup.members + userId
                     groupRef.child("members").setValue(newMembers).await()
                     db.getReference("Users/$userId/groups").child(groupId).setValue(true).await()
-                    // Refresh local state
-                    _group.value = group.copy(members = newMembers)
+                    
+                    // Update local state
+                    _group.value = currentGroup.copy(members = newMembers)
                 }
-            } catch (e: Exception) {}
+            } catch (e: Exception) {
+                e.printStackTrace()
+            }
         }
     }
 }

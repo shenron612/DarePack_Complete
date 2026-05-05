@@ -3,8 +3,10 @@ package com.example.darepack_complete.darepack
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ExitToApp
 import androidx.compose.material3.*
@@ -22,8 +24,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.compose.AsyncImage
 import com.example.darepack_complete.ui.theme.*
 import com.example.darepack_complete.viewmodel.ProfileViewModel
-import com.example.darepack_complete.ui.components.GradientButton
-import com.example.darepack_complete.ui.components.LuminousBadge
+import com.example.darepack_complete.ui.components.*
 
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.PickVisualMediaRequest
@@ -48,7 +49,7 @@ fun ProfileScreen(
     }
 
     Scaffold(
-        containerColor = LightBg,
+        containerColor = CyberDark,
         bottomBar = {
             DarePackBottomNav(
                 current = NavTab.PROFILE,
@@ -60,15 +61,8 @@ fun ProfileScreen(
         }
     ) { padding ->
         Box(modifier = Modifier.fillMaxSize().padding(padding)) {
+            CyberBackground()
             
-            // Background decoration
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(180.dp)
-                    .background(Brush.verticalGradient(listOf(Purple.copy(alpha = 0.1f), Color.Transparent)))
-            )
-
             // Sign Out Button (Top-Right)
             IconButton(
                 onClick = { vm.signOut(); onSignOut() },
@@ -80,6 +74,7 @@ fun ProfileScreen(
             Column(
                 modifier = Modifier
                     .fillMaxSize()
+                    .verticalScroll(rememberScrollState())
                     .padding(horizontal = 24.dp),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
@@ -90,7 +85,7 @@ fun ProfileScreen(
                     Box(
                         Modifier
                             .size(110.dp)
-                            .background(Brush.radialGradient(listOf(Purple.copy(alpha = 0.2f), Color.Transparent)), CircleShape)
+                            .background(Brush.radialGradient(listOf(CyberBlue.copy(alpha = 0.2f), Color.Transparent)), CircleShape)
                     )
                     
                     Box(
@@ -104,13 +99,13 @@ fun ProfileScreen(
                                 model = user!!.photoUrl,
                                 contentDescription = "Profile photo",
                                 contentScale = ContentScale.Crop,
-                                modifier = Modifier.fillMaxSize().background(LightCard)
+                                modifier = Modifier.fillMaxSize().background(CyberSurface)
                             )
                         } else {
                             Box(
                                 modifier = Modifier
                                     .fillMaxSize()
-                                    .background(Brush.linearGradient(PurpleGradient)),
+                                    .background(Brush.linearGradient(CyberGradient)),
                                 contentAlignment = Alignment.Center
                             ) {
                                 Text(
@@ -127,7 +122,7 @@ fun ProfileScreen(
                                 modifier = Modifier.fillMaxSize().background(Color.Black.copy(alpha = 0.4f)),
                                 contentAlignment = Alignment.Center
                             ) {
-                                CircularProgressIndicator(color = Color.White, modifier = Modifier.size(30.dp), strokeWidth = 3.dp)
+                                CircularProgressIndicator(color = CyberBlue, modifier = Modifier.size(30.dp), strokeWidth = 3.dp)
                             }
                         }
                     }
@@ -135,31 +130,25 @@ fun ProfileScreen(
 
                 Spacer(Modifier.height(20.dp))
 
-                Text(user?.name ?: "Loading...", fontSize = 26.sp, fontWeight = FontWeight.ExtraBold, color = TextPrimary)
-                Text(user?.email ?: "", fontSize = 14.sp, color = TextSecondary)
+                Text(user?.name ?: "Loading...", fontSize = 26.sp, fontWeight = FontWeight.ExtraBold, color = CyberText)
+                Text(user?.email ?: "", fontSize = 14.sp, color = CyberBlue.copy(alpha = 0.7f))
                 
                 Spacer(Modifier.height(12.dp))
-                LuminousBadge(text = user?.gender ?: "User", color = Teal)
+                LuminousBadge(text = user?.gender ?: "User", color = CyberBlue)
 
                 Spacer(Modifier.height(40.dp))
 
                 // Stats card
-                Card(
-                    modifier = Modifier.fillMaxWidth(),
-                    colors = CardDefaults.cardColors(containerColor = LightCard),
-                    shape = RoundedCornerShape(20.dp),
-                    elevation = CardDefaults.cardElevation(defaultElevation = 0.dp),
-                    border = CardDefaults.outlinedCardBorder().copy(width = 1.dp, brush = Brush.linearGradient(listOf(LightSurface, Color.Transparent)))
-                ) {
+                CyberCard(modifier = Modifier.fillMaxWidth()) {
                     Row(
-                        modifier = Modifier.fillMaxWidth().padding(24.dp),
+                        modifier = Modifier.fillMaxWidth(),
                         horizontalArrangement = Arrangement.SpaceEvenly
                     ) {
                         StatItem(
                             value = (user?.totalCompleted ?: 0).toString(),
                             label = "Completed"
                         )
-                        Box(Modifier.width(1.dp).height(40.dp).background(LightSurface))
+                        Box(Modifier.width(1.dp).height(40.dp).background(CyberBlue.copy(alpha = 0.2f)))
                         StatItem(
                             value = "Legend",
                             label = "Rank"
@@ -173,14 +162,16 @@ fun ProfileScreen(
                 GradientButton(
                     text = "View Memories Archive",
                     onClick = onMemories,
-                    gradient = PurpleGradient
+                    gradient = CyberGradient
                 )
                 
                 Spacer(Modifier.height(16.dp))
                 
                 TextButton(onClick = { launcher.launch(PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly)) }) {
-                    Text("Change Profile Picture", color = PurpleDark, fontWeight = FontWeight.Bold)
+                    Text("Change Profile Picture", color = CyberBlue, fontWeight = FontWeight.Bold)
                 }
+
+                Spacer(Modifier.height(40.dp))
             }
         }
     }
@@ -193,12 +184,12 @@ fun StatItem(value: String, label: String) {
             text = value,
             fontSize = 24.sp,
             fontWeight = FontWeight.ExtraBold,
-            color = Purple
+            color = CyberBlue
         )
         Text(
             text = label,
             fontSize = 12.sp,
-            color = TextSecondary,
+            color = CyberText.copy(alpha = 0.6f),
             fontWeight = FontWeight.Medium
         )
     }
