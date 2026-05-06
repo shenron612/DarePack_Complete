@@ -30,6 +30,10 @@ class HomeViewModel : ViewModel() {
     private fun loadDares() {
         val userId = auth.currentUser?.uid ?: return
         
+        // Remove existing listeners if any
+        pendingListener?.let { db.getReference("Dares").removeEventListener(it) }
+        sentListener?.let { db.getReference("Dares").removeEventListener(it) }
+
         pendingListener = object : ValueEventListener {
             override fun onDataChange(snapshot: DataSnapshot) {
                 val dares = snapshot.children.mapNotNull { it.getValue(DarePackModel::class.java) }

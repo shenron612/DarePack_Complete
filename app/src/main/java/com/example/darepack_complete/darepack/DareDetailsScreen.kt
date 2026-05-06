@@ -21,6 +21,7 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.compose.AsyncImage
 import com.example.darepack_complete.ui.theme.*
@@ -40,6 +41,7 @@ fun DareDetailScreen(
     val state by vm.state.collectAsState()
     val dare  by vm.dare.collectAsState()
     val proof by vm.proof.collectAsState()
+    val context = LocalContext.current
 
     var caption      by remember { mutableStateOf("") }
     var selectedUri  by remember { mutableStateOf<Uri?>(null) }
@@ -118,7 +120,7 @@ fun DareDetailScreen(
                                 if (dare?.status == "pending") {
                                     MetaRow(
                                         label = "Deadline",
-                                        value = dare?.deadline?.toDate()?.let { sdf.format(it) } ?: ""
+                                        value = if (dare?.deadlineLong != 0L) sdf.format(Date(dare!!.deadlineLong)) else "No deadline"
                                     )
                                 }
                             }
@@ -228,7 +230,7 @@ fun DareDetailScreen(
                                 text = "Mark as completed ✓",
                                 onClick = {
                                     selectedUri?.let {
-                                        vm.completeDare(dareId, it, caption)
+                                        vm.completeDare(context, dareId, it, caption)
                                     }
                                 },
                                 modifier = Modifier.fillMaxWidth(),

@@ -21,7 +21,7 @@ import androidx.compose.ui.graphics.Brush
 import com.example.darepack_complete.ui.components.*
 import com.example.darepack_complete.ui.theme.*
 import com.example.darepack_complete.viewmodel.HomeViewModel
-import com.google.firebase.Timestamp
+import java.util.Date
 import java.text.SimpleDateFormat
 import java.util.Locale
 
@@ -150,7 +150,7 @@ fun DareCard(dare: Dare, onClick: () -> Unit) {
         
         if (dare.status == "pending") {
             val date = SimpleDateFormat("MMM dd, yyyy", Locale.getDefault())
-                .format(dare.deadline.toDate())
+                .format(Date(dare.deadlineLong))
             HorizontalDivider(Modifier.padding(vertical = 12.dp), color = CyberBlue.copy(alpha = 0.1f), thickness = 1.dp)
             Text(
                 "Expires on: $date",

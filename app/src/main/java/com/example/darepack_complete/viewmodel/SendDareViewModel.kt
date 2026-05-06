@@ -6,7 +6,6 @@ import com.example.darepack_complete.models.BucketItem
 import com.example.darepack_complete.models.DarePackModel
 import com.example.darepack_complete.models.Group
 import com.example.darepack_complete.models.UserModel
-import com.google.firebase.Timestamp
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.FirebaseDatabase
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -82,7 +81,7 @@ class SendDareViewModel : ViewModel() {
                     daredTo = target.userId,
                     daredToName = target.name,
                     status = "pending",
-                    deadline = Timestamp(Date(deadlineMillis))
+                    deadline = deadlineMillis
                 )
 
                 dareRef.setValue(dare).await()

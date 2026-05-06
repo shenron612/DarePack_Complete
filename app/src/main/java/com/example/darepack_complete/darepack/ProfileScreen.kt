@@ -1,5 +1,7 @@
 package com.example.darepack_complete.darepack
 
+import android.util.Log
+import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -20,6 +22,7 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.compose.AsyncImage
 import com.example.darepack_complete.ui.theme.*
@@ -30,6 +33,7 @@ import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ProfileScreen(
     onMemories: () -> Unit,
@@ -41,15 +45,38 @@ fun ProfileScreen(
 ) {
     val user by vm.user.collectAsState()
     val uploading by vm.uploading.collectAsState()
+    val context = LocalContext.current
 
     val launcher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.PickVisualMedia()
     ) { uri ->
-        uri?.let { vm.updateProfileImage(it) }
+        uri?.let { vm.updateProfileImage(context, it) }
     }
 
     Scaffold(
         containerColor = CyberDark,
+        topBar = {
+            TopAppBar(
+                title = { Text("PROFILE", color = CyberText, fontWeight = FontWeight.ExtraBold, letterSpacing = 2.sp, fontSize = 18.sp) },
+                actions = {
+                    IconButton(
+                        onClick = { 
+                            Log.d("ProfileScreen", "Logout clicked")
+                            vm.signOut()
+                            Toast.makeText(context, "Signed out successfully", Toast.LENGTH_SHORT).show()
+                            onSignOut() 
+                        }
+                    ) {
+                        Icon(
+                            imageVector = Icons.AutoMirrored.Filled.ExitToApp,
+                            contentDescription = "Sign out",
+                            tint = Pink
+                        )
+                    }
+                },
+                colors = TopAppBarDefaults.topAppBarColors(containerColor = CyberDark)
+            )
+        },
         bottomBar = {
             DarePackBottomNav(
                 current = NavTab.PROFILE,
@@ -63,14 +90,6 @@ fun ProfileScreen(
         Box(modifier = Modifier.fillMaxSize().padding(padding)) {
             CyberBackground()
             
-            // Sign Out Button (Top-Right)
-            IconButton(
-                onClick = { vm.signOut(); onSignOut() },
-                modifier = Modifier.align(Alignment.TopEnd).padding(16.dp)
-            ) {
-                Icon(Icons.AutoMirrored.Filled.ExitToApp, contentDescription = "Sign out", tint = Pink)
-            }
-
             Column(
                 modifier = Modifier
                     .fillMaxSize()
@@ -78,7 +97,7 @@ fun ProfileScreen(
                     .padding(horizontal = 24.dp),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                Spacer(Modifier.height(60.dp))
+                Spacer(Modifier.height(20.dp))
 
                 // Avatar with glow
                 Box(contentAlignment = Alignment.Center) {

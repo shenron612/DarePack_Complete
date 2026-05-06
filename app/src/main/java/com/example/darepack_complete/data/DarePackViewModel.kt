@@ -10,21 +10,15 @@ import androidx.lifecycle.viewModelScope
 import androidx.navigation.NavController
 import com.example.darepack_complete.models.ProductModel
 import com.example.darepack_complete.navigation.Routes
+import com.example.darepack_complete.utils.CloudinaryHelper
 import com.google.firebase.database.FirebaseDatabase
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
 import kotlinx.coroutines.withContext
-import okhttp3.MediaType.Companion.toMediaTypeOrNull
-import okhttp3.MultipartBody
-import okhttp3.OkHttpClient
-import okhttp3.Request
-import okhttp3.RequestBody
 import java.io.InputStream
 
 class ProductViewModel : ViewModel() {
-private val cloudinaryUrl = "https://api.cloudinary.com/v1_1/dkq3txb6h/image/upload"
-private val uploadPreset = "first_app"
 
 fun uploadProduct(
     imageUri: Uri?,
@@ -39,7 +33,7 @@ fun uploadProduct(
 ) {
     viewModelScope.launch(Dispatchers.IO) {
         try {
-            val imageUrl = imageUri?.let { uploadToCloudinary(context, it) }
+            val imageUrl = imageUri?.let { CloudinaryHelper.uploadImage(context, it) }
             val ref = FirebaseDatabase.getInstance().getReference("Products").push()
             val productData = ProductModel(
                 id = ref.key,
@@ -62,25 +56,6 @@ fun uploadProduct(
             }
         }
     }
-}
-
-private fun uploadToCloudinary(context: Context, uri: Uri): String {
-    val contentResolver = context.contentResolver
-    val inputStream: InputStream? = contentResolver.openInputStream(uri)
-    val fileBytes = inputStream?.readBytes() ?: throw Exception("Image read failed")
-    val requestBody = MultipartBody.Builder().setType(MultipartBody.FORM)
-        .addFormDataPart(
-            "file", "image.jpg",
-            RequestBody.create("image/*".toMediaTypeOrNull(), fileBytes)
-        )
-        .addFormDataPart("upload_preset", uploadPreset).build()
-    val request = Request.Builder().url(cloudinaryUrl).post(requestBody).build()
-    val response = OkHttpClient().newCall(request).execute()
-    if (!response.isSuccessful) throw Exception("Upload failed")
-    val responseBody = response.body?.string()
-    val secureUrl = Regex("\"secure_url\":\"(.*?)\"")
-        .find(responseBody ?: "")?.groupValues?.get(1)
-    return secureUrl ?: throw Exception("Failed to get image URL")
 }
 
 private val _products = mutableStateListOf<ProductModel>()
@@ -118,7 +93,7 @@ fun updateProduct(
         try {
             var imageUrl: String? = null
             if (imageUri != null) {
-                imageUrl = uploadToCloudinary(context, imageUri)
+                imageUrl = CloudinaryHelper.uploadImage(context, imageUri)
             }
 
             val ref = FirebaseDatabase.getInstance().getReference("Products").child(productId)

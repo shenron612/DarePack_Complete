@@ -172,7 +172,7 @@ fun MemoryCard(memory: MemoryItem) {
                         )
                     }
                     Text(
-                        sdf.format(memory.dare.deadline.toDate()),
+                        sdf.format(Date(memory.dare.deadlineLong)),
                         color    = CyberText.copy(alpha = 0.6f),
                         fontSize = 12.sp
                     )
