@@ -1,6 +1,7 @@
 package com.example.darepack_complete.navigation
 
 object Routes {
+    const val SPLASH = "splash"
     const val HOME = "home"
     const val LOGIN = "login"
     const val PROFILE = "profile"

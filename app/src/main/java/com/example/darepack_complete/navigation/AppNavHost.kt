@@ -12,9 +12,17 @@ import com.example.darepack_complete.darepack.*
 @Composable
 fun AppNavHost(
     navController: NavHostController = rememberNavController(),
-    startDestination: String = Routes.LOGIN
+    startDestination: String = Routes.SPLASH
 ) {
     NavHost(navController = navController, startDestination = startDestination) {
+
+        composable(Routes.SPLASH) {
+            SplashScreen(onNext = {
+                navController.navigate(Routes.LOGIN) {
+                    popUpTo(Routes.SPLASH) { inclusive = true }
+                }
+            })
+        }
 
         composable(Routes.LOGIN) {
             LoginScreen(onLoginSuccess = {
